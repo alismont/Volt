@@ -896,7 +896,7 @@ void loop() {
   F8[17] =  F8[8] - F8[7];
   F8[12] =  F8[3] - F8[2];
   F8[22] =  F8[12] / F8[17];
-  if ((F8[45] > F8[7]) && (F8[45] < F8[8])) {
+  if ((F8[45] >= F8[7]) && (F8[45] < F8[8])) {
     B3[35] = 1;
     F8[27] =  F8[45] - F8[7];
     F8[32] =  F8[22] * F8[27];
@@ -1097,7 +1097,7 @@ void loop() {
     F10[22] = (F10[20] + F10[21]) / 2;
   }
   //-------------------------------application hysteresis d'inversion sens du crt
-  if ( T1DSec && !TDN[34]) {                         //-----tempo increment inversion hyster
+  if (!TDN[34]) {                         //-----tempo increment inversion hyster
     CptT[34] = true;
   }
   if ( TDN[34]) {
@@ -5379,7 +5379,7 @@ void loop() {
     T[14] = 0;
   }
 
-  if (buttonPin25Num >= 4) {
+  if (buttonPin25Num <= 4) {
     T[15] =  0.0;
     TDN[15] =  1.0;
     CptT[15] = false;
@@ -5511,7 +5511,7 @@ void loop() {
   else {
     B3[105] = 0;
   }
-  if (buttonPin25Num < 4 && buttonPin27Num < 4 && buttonPin29Num < 4 && !B3[209] && !B3[210] && !B3[211] ) {
+  if (buttonPin31Num < 4 && buttonPin27Num < 4 && buttonPin29Num < 4 && !B3[209] && !B3[210] && !B3[211] ) {
     B3[109] = 1;
   }
   else {
