@@ -1,4 +1,4 @@
-
+// DATE 18/06/16
 // application mhp avec Processing
 
 // I assume you know how to connect the DS1302.
