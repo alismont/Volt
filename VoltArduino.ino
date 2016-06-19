@@ -314,7 +314,7 @@ void Cmd_LED13(CommandParameter &Parameters)
   const char *State = Parameters.NextParameter();
 
   if (strcmp(State, "on") == 0)
- {
+  {
     digitalWrite(LED13, HIGH);
   }
   else
@@ -331,7 +331,7 @@ void Cmd_Unknown()
 //----------------------------------------------------------------------------------SETUP
 void setup() {
 
-  Serial.begin(115200); // initialise la vitesse de la connexion série
+  Serial.begin(9600); // initialise la vitesse de la connexion série
   Serial3.begin(9600);
   // genunolink
   Serial.print(F("gemunolink"));
@@ -578,7 +578,7 @@ void setup() {
 //----------------------------------------------------------------------------------LOOP
 void loop() {
 
-  SerialCommandHandler.Process();
+  //SerialCommandHandler.Process();
 
 
   if (B3[31]) {
@@ -1402,6 +1402,10 @@ void loop() {
     B3[132] = 0 ;
   }
 
+
+
+
+
   if ((!B3[304]  || B3[269]) && B3[130] && (B3[131]  || B3[132]) && !T52TT ) { //    T52TT à déclarer et faire !! tof
     B3[224] = 1 ;
   }
@@ -1577,6 +1581,9 @@ void loop() {
       B3[57] = 1.0;
       B3[58] = 1.0;  //------------------------b3:3/9------- ONE SHOT START PV 1
     }
+    else {
+      B3[58] = 0.0;
+    }
   }
   else {
     B3[57] = 0.0;//---bit ons
@@ -1587,6 +1594,9 @@ void loop() {
     if (!B3[59]) {  //---bit ons
       B3[59] = 1.0;
       B3[60] = 1.0;  //------------------------b3:3/11------- ONE SHOT STOP PV 1
+    }
+    else {
+      B3[60] = 0.0;
     }
   }
   else {
@@ -1622,6 +1632,9 @@ void loop() {
       B3[61] = 1.0;
       B3[62] = 1.0;  //------------------------b3:3/13------- ONE SHOT START PV 2
     }
+    else {
+      B3[62] = 0.0;
+    }
   }
   else {
     B3[61] = 0.0;//---bit ons
@@ -1631,6 +1644,9 @@ void loop() {
     if (!B3[63]) {  //---bit ons
       B3[63] = 1.0;
       B3[64] = 1.0;  //------------------------b3:3/15------- ONE SHOT STOP PV 2
+    }
+    else {
+      B3[64] = 0.0;
     }
   }
   else {
@@ -1813,7 +1829,7 @@ void loop() {
   }
 
 
-  if (buttonPin33Num < 4 && TDN[0] && !B3[469]) {
+  if (buttonPin22Num >= 4 &&buttonPin33Num < 4 && TDN[0] && !B3[469]) {
     B3[153] = 1.0;// SECURITE ONDULEUR
   }
   else {
@@ -5605,7 +5621,7 @@ void loop() {
   Ecriture ();// tablette vers arduino
   Lecture (); // arduino vers tablette
 
-  Gemunolink ();
+  //Gemunolink ();
 
   //scanning
   if (CptT[70]) {
