@@ -2170,7 +2170,7 @@ void loop() {
   if (Heure == 10 || B3[125] ) {
     if (!B3[88]) {
       B3[88] = 1.0;
-      B3[87] = 1.0;
+      B3[87] = 1.0;  // a verifier
       B3[66] = 0.0;
       B3[487] = 0.0;
       B3[488] = 0.0;
@@ -2408,7 +2408,7 @@ void loop() {
 
   if (TDN[0] && B3[123]) {//-cond ons
     if (!B3[65]) {  //---bit ons
-      B3[65] = 1.0;
+      B3[65] = 1.0;  // a verifier
       B3[66] = 1.0;  //---------------------------b3:4/1---- memo coupure 16 BCU
     }
   }
@@ -2418,7 +2418,7 @@ void loop() {
 
   if (TDN[0] && buttonPin35Num < 4) {//-cond ons
     if (!B3[67]) {  //---bit ons
-      B3[67] = 1.0;
+      B3[67] = 1.0; a verifier
       B3[487] = 1.0;  //------------------------b3:4/3------- memo coupure   BMS
     }
   }
@@ -2428,7 +2428,7 @@ void loop() {
 
   if (TDN[0] && TDN[25]) {//-cond ons
     if (!B3[69]) {  //---bit ons
-      B3[69] = 1.0;
+      B3[69] = 1.0; a verifier 
       B3[488] = 1.0;  //------------------------b3:4/5------- memo coupure tension
     }
   }
