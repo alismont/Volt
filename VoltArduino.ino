@@ -304,32 +304,29 @@ bool T55TT;
 bool T52TT;
 
 //...............................................................................gemunolink.........................................
-//TimePlot MyPlot;
-//InterfacePanel Panel("Test");
-//CommandHandler<> SerialCommandHandler;
-
-// The interface panel we are sending data to
-
+TimePlot MyPlot;
+InterfacePanel Panel("Test");
+CommandHandler<> SerialCommandHandler;
 
 //-----------------------------------------------------
-//void Cmd_LED13(CommandParameter &Parameters)
-//{
-//  const char *State = Parameters.NextParameter();
-//
-//  if (strcmp(State, "on") == 0)
-//  {
-//    digitalWrite(LED13, HIGH);
-//  }
-//  else
-//  {
-//    digitalWrite(LED13, LOW);
-//  }
-//}
-//
-//void Cmd_Unknown()
-//{
-//  Serial.println(F("I don't know that command. Try another. "));
-//}
+void Cmd_LED13(CommandParameter &Parameters)
+{
+  const char *State = Parameters.NextParameter();
+
+  if (strcmp(State, "on") == 0)
+ {
+    digitalWrite(LED13, HIGH);
+  }
+  else
+  {
+    digitalWrite(LED13, LOW);
+  }
+}
+
+void Cmd_Unknown()
+{
+  Serial.println(F("I don't know that command. Try another. "));
+}
 
 //----------------------------------------------------------------------------------SETUP
 void setup() {
@@ -338,8 +335,8 @@ void setup() {
   Serial3.begin(9600);
   // genunolink
   Serial.print(F("gemunolink"));
-//  SerialCommandHandler.AddCommand(F("LED13"), Cmd_LED13);
-//  SerialCommandHandler.SetDefaultHandler(Cmd_Unknown);
+  SerialCommandHandler.AddCommand(F("LED13"), Cmd_LED13);
+  SerialCommandHandler.SetDefaultHandler(Cmd_Unknown);
 
   Timer1.initialize(100000);         // initialize timer1
   //Timer1.setPeriod(100);
@@ -581,11 +578,8 @@ void setup() {
 //----------------------------------------------------------------------------------LOOP
 void loop() {
 
-//  SerialCommandHandler.Process();
+  SerialCommandHandler.Process();
 
-  if (CheckBox1) {
-    digitalWrite(LED13, HIGH);
-  }
 
   if (B3[31]) {
     T1Cent = 1;
@@ -7316,11 +7310,11 @@ void MessTraitement() {
 void Gemunolink() {
 
 
-//  MyPlot.SendData("My Sensor", (Cycle));
+  MyPlot.SendData("My Sensor", (Cycle));
 
-//  Panel.SetProgress("Label1", (Cycle));
- // Panel.SetProgress("Cpt", (Cycle));
-  //Panel.SetText("Status", "OK");
+  Panel.SetProgress("Label1", (Cycle));
+  Panel.SetProgress("Cpt", (Cycle));
+  Panel.SetText("Status", "OK");
   //Panel.SetCheck("CheckBox1", false);
 
 }
