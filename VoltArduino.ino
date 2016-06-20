@@ -518,6 +518,7 @@ void setup() {
   N7[13] = 2;
   N7[14] = 4;
   N7[16] = 3;
+  N7[15] = 3000;
   N7[17] = 15;
   N7[26] = -2;
   N7[24] = -15;
@@ -1424,7 +1425,7 @@ void loop() {
     PWM51 = false;
     digitalWrite(LED51, LOW);
   }
-  
+
   if (B3[224]) {
     T[52] =  0.0;
     TDN[52] =  1.0;
@@ -2327,19 +2328,6 @@ void loop() {
   if (T[31] >= 10) {
     TDN[31] =  1.0;
     T[31] = 10;
-  }
-
-  if (buttonPin52Num >= 4) {          //---- optocoupleur BCU batt1 tous actif
-    CptT[28] = true;
-  }
-  else {
-    T[28] =  0.0;
-    TDN[28] =  0.0;
-    CptT[28] = false;
-  }
-  if (T[28] >= 5) {
-    TDN[28] =  1.0;
-    T[28] = 5;
   }
 
   if (buttonPin46Num >= 4) {         //---- optocoupleur BCU batt2 tous actif
@@ -4644,7 +4632,7 @@ void loop() {
 
   if (N7[10] ==  790.0 && B3[416] && N7[11] == N7[10]) {                             //--- pas 790 FIN CYCLE AUTOCONF
     B3[390] =  1.0;
-    if (N7[11] == N7[10] && buttonPin27Num < 4) {
+    if (N7[11] == N7[10] && TDN[70]) {
       N7[10] =  0.0;
     }
   }
@@ -5298,6 +5286,9 @@ void loop() {
     B3[244] =  0.0;
   }
 
+  if (N7[10] == 790.0) {        //---- optocoupleur BCU batt1 tous actif
+    B3[11] = 1;
+  }
 
   if (F8[145] > 556 || F8[145] < 456) {
     B3[449] =   1.0;                                     //------B3:28/0
@@ -5395,9 +5386,9 @@ void loop() {
     CptT[35] = false;
   }
 
-  if (T[35] >= 3000) {
+  if (T[35] >= N7[15]) {
     TDN[35] =  1.0;
-    T[35] = 3000;
+    T[35] = N7[15];
   }
 
   if (TDN[35] || N7[80] == 0) {
@@ -5563,7 +5554,7 @@ void loop() {
   if (N7[103] == 10 && TDN[12] ) {
     N7[103] = 0;
   }
-  if (!B3[209] && buttonPin31Num >= 4 && buttonPin27Num >= 4 && !B3[304]) {
+  if (!B3[209] && buttonPin31Num >= 4 && buttonPin27Num >= 4 && !B3[304] && (!B3[11] || buttonPin39Num < 4)) {
     B3[108] = 1;
   }
   else {
@@ -5575,9 +5566,6 @@ void loop() {
   else {
     B3[209] = 0;
   }
-
-
-
   if (B3[209] && !B3[178])  {
     PWM4 = 1;
     digitalWrite(LED4, HIGH);
@@ -5613,7 +5601,7 @@ void loop() {
     digitalWrite(LED5, LOW);
   }
 
-  if (!B3[211] && buttonPin25Num >= 4 && !B3[304] ) {
+  if (!B3[211] && buttonPin25Num >= 4 && !B3[304] && (!B3[11] || buttonPin39Num < 4)  ) {
     B3[106] = 1;
   }
   else {
@@ -5635,6 +5623,11 @@ void loop() {
     PWM6 = 0;
     digitalWrite(LED6, LOW);
   }
+
+  if ( B3[209] && B3[211] ) {
+    B3[11] = 0.0;
+  }
+
   if (!B3[212] && buttonPin25Num >= 4 ) {
     B3[105] = 1;
   }
