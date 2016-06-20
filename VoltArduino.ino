@@ -78,6 +78,9 @@ int PWM9 = 0;
 int PWM11 = 0;
 int PWM12 = 0;
 
+int PWM49 = 0;
+int PWM51 = 0;
+
 float N7M60 = 0;
 float F8M105 = 0;
 float F8M161 = 0;
@@ -239,6 +242,7 @@ int MessTbl[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 int MessIn1 = 0;
 int MessIn2 = 0;
 int MessOut = 0;
+int MessIn = 0;
 int MessPoint = 1;
 int MessInMemo1 = 0;
 int MessInMemo2 = 0;
@@ -462,7 +466,7 @@ void setup() {
 
   F8[55] = 46.0;
   F8[56] = 48.0;
-  F8[57] = 53.0;
+  F8[57] = 53.2;
   F8[58] = 59.0;
   F8[59] = 58.5;
 
@@ -1401,11 +1405,6 @@ void loop() {
   else {
     B3[132] = 0 ;
   }
-
-
-
-
-
   if ((!B3[304]  || B3[269]) && B3[130] && (B3[131]  || B3[132]) && !T52TT ) { //    T52TT à déclarer et faire !! tof
     B3[224] = 1 ;
   }
@@ -1413,6 +1412,19 @@ void loop() {
     B3[224] = 0 ;
   }
 
+  if (!B3[178] && B3[224]) {
+    PWM49 = true;
+    digitalWrite(LED49, HIGH);
+    PWM51 = true;
+    digitalWrite(LED51, HIGH);
+  }
+  else {
+    PWM49 = false;
+    digitalWrite(LED49, LOW);
+    PWM51 = false;
+    digitalWrite(LED51, LOW);
+  }
+  
   if (B3[224]) {
     T[52] =  0.0;
     TDN[52] =  1.0;
@@ -1761,7 +1773,7 @@ void loop() {
     T[29] = 50;
   }
 
-  if ((!B3[85] && !B3[86] || B3[304]) && !B3[87] && !B3[2]) {
+  if ((!B3[85] && !B3[86] || B3[304]) && !B3[87] && !B3[215]  && !B3[216]) {
     B3[147] = 1.0;
   }
   else {
@@ -1802,11 +1814,13 @@ void loop() {
   else {
     B3[213] = 0.0;
   }
-  if (B3[213] && B3[178]) {
+  if (B3[213] && !B3[178]) {
     PWM8 = 1;
+    digitalWrite(LED8, HIGH);
   }
   else {
     PWM8 = 0;
+    digitalWrite(LED8, LOW);
   }
   if (B3[213]) {
     T[39] =  0.0;
@@ -1863,11 +1877,13 @@ void loop() {
   else {
     B3[214] = 0.0;
   }
-  if (B3[214] && B3[178]) {
+  if (B3[214] && !B3[178]) {
     PWM9 = 1;
+    digitalWrite(LED9, HIGH);
   }
   else {
     PWM9 = 0;
+    digitalWrite(LED9, LOW);
   }
 
   if (B3[214]) {
@@ -2037,11 +2053,6 @@ void loop() {
   if (B3[16] && !B3[161] && !T63TT  && ( B3[95] || TDN[5] || B3[258] || B3[262])) {
     CptT[5] = true;
   }
-
-  //  if (B3[16] && !B3[161] && !T63TT  && ( B3[95] || TDN[5] || B3[258] || B3[262])) {
-  //    T[5] = T[5];
-  //  }
-
   else {
     T[5] =  0.0;
     TDN[5] =  0.0;
@@ -2054,7 +2065,7 @@ void loop() {
   }
 
   if (TDN[5] && !TDN[27] && (TDN[2] || !B3[124] || B3[304])) {
-    B3[2] = 1 ;// dem&&e marche chargeur
+    B3[2] = 1 ;// demande marche chargeur
   }
   else {
     B3[2] = 0 ;
@@ -2066,11 +2077,13 @@ void loop() {
   else {
     B3[215] = 0 ;
   }
-  if (B3[215] && B3[178]) {
+  if (B3[215] && !B3[178]) {
     PWM11 = 1;
+    digitalWrite(LED11, HIGH);
   }
   else {
     PWM11 = 0;
+    digitalWrite(LED11, LOW);
   }
   if (B3[215]) {
     CptT[66] = true;
@@ -2112,11 +2125,13 @@ void loop() {
   else {
     B3[216] = 0 ;
   }
-  if (B3[216] && B3[178]) {
+  if (B3[216] && !B3[178]) {
     PWM12 = 1;
+    digitalWrite(LED12, HIGH);
   }
   else {
     PWM12 = 0;
+    digitalWrite(LED12, LOW);
   }
 
   if (B3[216]) {
@@ -2285,7 +2300,6 @@ void loop() {
   if (T[2] >= 300) {
     TDN[2] =  1.0;
     T[2] = 300;
-    CptT[2] = false;
   }
 
   if (buttonPin50Num >= 4) {       //---- optocoupleur BCU actif batt1 au moins 1 cell balancing
@@ -2574,7 +2588,6 @@ void loop() {
   else {
     B3[523] = 0.0;//---bit ons
   }
-
 
   if (B3[357]) {//-cond ons
     if (!B3[533]) {  //---bit ons
@@ -4264,7 +4277,14 @@ void loop() {
     B3[368] =  0.0; //-------------B3:22/15
   }
 
-  if (N7[10] == 430.0 && buttonPin25Num >= 4 ) {
+  if (N7[10] ==  430.0 && N7[11] == N7[10] && (buttonPin25Num >= 4 || B3[239])) {
+    B3[239] = 1;
+  }
+  else {
+    B3[239] = 0;
+  }
+
+  if (N7[10] == 430.0 && B3[239] && TDN[70]) {
     N7[10] =  500.0;
   }
 
@@ -4518,8 +4538,8 @@ void loop() {
   }
 
 
-  if (N7[10] == 640.0 && N7[11] == N7[10] && ( buttonPin25Num >=4 || B3[237] )) {
-  B3[237] =  1.0;
+  if (N7[10] == 640.0 && N7[11] == N7[10] && ( buttonPin25Num >= 4 || B3[237] )) {
+    B3[237] =  1.0;
   }
   else {
     B3[237] =  0.0;                                           //-------------B3:23/14
@@ -4527,11 +4547,11 @@ void loop() {
 
 
   if (N7[10] ==  640.0 && B3[237] && TDN[70]) {
-  N7[10] =  650.0;
+    N7[10] =  650.0;
   }
 
   if (N7[10] ==  650.0 && N7[11] == N7[10]) {//--- pas 600 message chargeur 2
-  B3[380] =  1.0;
+    B3[380] =  1.0;
     if (TDN[70] && (TDN[46] || B3[235]) ) {
       N7[10] =  659.0;
     }
@@ -4540,19 +4560,19 @@ void loop() {
     B3[380] =  0.0; //-------------B3:23/11
   }
   if (N7[10] == 650.0 && N7[11] == N7[10] && B3[471] ) { //-----pas 650---- ANOMALIE COURANT NEG CHARG 2
-  N7[10] =  651.0;
+    N7[10] =  651.0;
   }
 
   if (N7[10] == 651.0 && N7[11] == N7[10] && TDN[70] ) { //-----pas 651---- MESSAGE ALARME COURANT NEG CHARG 2
-  N7[10] =  0.0;
+    N7[10] =  0.0;
   }
 
   if (N7[10] == 659.0 && N7[11] == N7[10] && TDN[70] ) { //-----pas 659---- MESSAGE CHARG 2 DETECTE
-  N7[10] =  660.0;
+    N7[10] =  660.0;
   }
 
   if (N7[10] ==  660.0 && N7[11] == N7[10]) {                        //--- pas 660 messURE HYSTERESIS HALL chargeur 2
-  B3[381] =  1.0;
+    B3[381] =  1.0;
     if (N7[11] == N7[10] && TDN[70] && TDN[47] ) {
       N7[10] =  670.0;
     }
@@ -4562,7 +4582,7 @@ void loop() {
   }
 
   if (N7[10] ==  670.0 && N7[11] == N7[10]) {                        //--- pas 660 messURE HYSTERESIS HALL chargeur 2
-  B3[382] =  1.0;
+    B3[382] =  1.0;
     if (TDN[70]) {
       N7[10] =  690.0;
     }
@@ -4571,19 +4591,19 @@ void loop() {
     B3[382] =  0.0;                         //-------------B3:23/12
   }
 
-  if ((buttonPin25Num >=4 || B3[233]) && N7[10] ==  690.0 && N7[11] == N7[10]) {                       //--- pas 660 messURE HYSTERESIS HALL chargeur 2
-  B3[233] =  1.0;
+  if ((buttonPin25Num >= 4 || B3[233]) && N7[10] ==  690.0 && N7[11] == N7[10]) {                      //--- pas 660 messURE HYSTERESIS HALL chargeur 2
+    B3[233] =  1.0;
   }
   else {
     B3[233] =  0.0;
   }
 
   if (N7[10] ==  690.0 && B3[233] && TDN[70]) {                       //--- pas 670 messURE HYSTERESIS EN CHARGE BATT chargeur 2
-  N7[10] =  700.0;
+    N7[10] =  700.0;
   }
 
   if (N7[10] ==  700.0 && N7[11] == N7[10]) {                         //--- pas 700 messURE PV 1
-  B3[383] =  1.0;
+    B3[383] =  1.0;
     if (TDN[70] && TDN[48] ) {
       N7[10] =  710.0;
     }
@@ -4593,22 +4613,22 @@ void loop() {
   }
 
   if (N7[10] == 700.0 && N7[11] == N7[10] && B3[472] ) { //-----pas 700---- ANOMALIE COURANT NEG PV1
-  N7[10] =  0.0;
+    N7[10] =  0.0;
   }
 
-  if (N7[10] == 710.0 && N7[11] == N7[10] && ( buttonPin25Num >=4 || B3[236] )) {
-  B3[236] =  1.0;
+  if (N7[10] == 710.0 && N7[11] == N7[10] && ( buttonPin25Num >= 4 || B3[236] )) {
+    B3[236] =  1.0;
   }
   else {
     B3[236] =  0.0;                                           //-------------B3:23/14
   }
 
   if (N7[10] ==  710.0 && B3[236] && TDN[70]) {                       //--- pas 670 messURE HYSTERESIS EN CHARGE BATT chargeur 2
-  N7[10] =  720.0;
+    N7[10] =  720.0;
   }
 
   if (N7[10] ==  720.0 && N7[11] == N7[10]) {                             //--- pas 720 messURE PV 2
-  B3[384] =  1.0;
+    B3[384] =  1.0;
     if (N7[11] == N7[10] && TDN[70] && TDN[49] ) {
       N7[10] =  790.0;
     }
@@ -4619,22 +4639,21 @@ void loop() {
 
 
   if (N7[10] == 720.0 && N7[11] == N7[10] && B3[473] ) { //-----pas 720---- ANOMALIE COURANT NEG PV2
-  N7[10] =  0.0;
+    N7[10] =  0.0;
   }
 
   if (N7[10] ==  790.0 && B3[416] && N7[11] == N7[10]) {                             //--- pas 790 FIN CYCLE AUTOCONF
-  B3[390] =  1.0;
-    if (N7[11] == N7[10] && TDN[70]) {
+    B3[390] =  1.0;
+    if (N7[11] == N7[10] && buttonPin27Num < 4) {
       N7[10] =  0.0;
     }
   }
   else {
-    B3[390] =  0.0;                                    //-------------B3:24/5
+    B3[390] =  0.0;
   }
 
-
   if (N7[10] ==  790.0 && !B3[416] && N7[11] == N7[10]) {                            //--- pas 790 FIN CYCLE AUTOCONF AVEC ALARM
-  B3[408] =  1.0;
+    B3[408] =  1.0;
     if (N7[11] == N7[10] && TDN[70] && buttonPin31Num < 4) {
       N7[10] =  0.0;
     }
@@ -4645,14 +4664,14 @@ void loop() {
 
 
   if (N7[10] != 0.0  ) {                       //------AUTOCONFIG EN COURS
-  B3[304] =  1.0;               //------------------------B3:18/15
+    B3[304] =  1.0;               //------------------------B3:18/15
   }
   else {
     B3[304] =  0.0;               //------------------------B3:18/15
   }
 
   if  (N7[10] == 10) {
-  F8[53] = F8[34];
+    F8[53] = F8[34];
     B3[305] =  0.0;     //-------- B3:19/0
     B3[306] =  0.0;
     B3[307] =  0.0;
@@ -4775,57 +4794,57 @@ void loop() {
 
 
   if (N7[10] == 372 && !TDN[70] ) {//    ------------------  MESURE CHUTE U PAR RELAIS 30A
-  F10[85] = F8[69] + F10[85];
+    F10[85] = F8[69] + F10[85];
     F10[86] = F10[86] + 1;
     F10[87] = F10[85] / F10[86];
   }
 
   if (N7[10] == 10 ) {
-  F10[85] = 0.0;
+    F10[85] = 0.0;
     F10[86] = 0.0;
   }
 
   if (N7[10] == 377 && TDN[73] ) {
-  F10[90] = F10[90] + F8[69];
+    F10[90] = F10[90] + F8[69];
     F10[91] = F10[91] + 1;
     F10[92] = F10[90] / F10[91];
   }
 
   if (N7[10] == 10 ) {
-  F10[90] = 0.0;
+    F10[90] = 0.0;
     F10[91] = 0.0;
   }
 
   if (N7[10] == 385 ) {
-  F8[36] = F10[87] - F10[92];
+    F8[36] = F10[87] - F10[92];
   }
 
   if (N7[10] == 385 && B3[396] ) {
-  F8[37] = F8[36] / 3.0;
+    F8[37] = F8[36] / 3.0;
   }
   if (N7[10] == 385 && !B3[396] ) {
-  F8[37] = F8[36] / 2.0;
+    F8[37] = F8[36] / 2.0;
   }
 
   if (N7[10] == 385 ) {                    //    ------------------  MESURE AVEC RELAIS GRID - RELAIS GROUP
-  if (F8[37] < 0.01 || F8[37] > 0.04  ) {
+    if (F8[37] < 0.01 || F8[37] > 0.04  ) {
       B3[476] =   1.0;                                    //------B3:29/11
     }
   }
 
   if (N7[10] == 385 && (F8[37] >= 0.01 && F8[37] <= 0.04 ) ) {
-  F8[70] =   F8[37];
+    F8[70] =   F8[37];
   }
 
-  if ((N7[10] >= 375 && N7[10] <= 380) || N7[10] >= 400)   {
-  B3[266] =   1.0; //------B3:16/9
+  if (N7[10] !=  790.0 && ((N7[10] >= 375 && N7[10] <= 380) || N7[10] >= 400))   {
+    B3[266] =   1.0; //------B3:16/9
   }
   else {
     B3[266] =   0.0;                                    //------B3:16/9    DMDE RELAIS GRID
   }
 
   if (N7[10] >= 375 && N7[10] < 380) {
-  B3[267] =   1.0; //------B3:16/10
+    B3[267] =   1.0; //------B3:16/10
     B3[268] =   1.0;
   }
   else {
@@ -4834,7 +4853,7 @@ void loop() {
   }
 
   if (N7[10] >= 375 && N7[10] <= 380)   {
-  CptT[73] = true;
+    CptT[73] = true;
   }
   else {
     T[73] =  0.0;
@@ -4843,29 +4862,30 @@ void loop() {
   }
 
   if (T[73] >= 20) {
-  TDN[73] =  1.0;
+    TDN[73] =  1.0;
     T[73] = 20;
   }
 
 
   if ((N7[10] == 430 || N7[10] == 530 || N7[10] == 595 || N7[10] == 640 || N7[10] == 690 || N7[10] == 710 )) {
-  CptT[80] = true;
+    CptT[80] = true;
   }
-  if (N7[10] != 430 && N7[10] != 530 && N7[10] != 595 && N7[10] != 640 && N7[10] != 690 && N7[10] != 710) {
-  T[80] =  0.0;
+  //if (N7[10] != 430 && N7[10] != 530 && N7[10] != 595 && N7[10] != 640 && N7[10] != 690 && N7[10] != 710)
+  else {
+    T[80] =  0.0;
     TDN[80] =  0.0;
     CptT[80] = false;
   }
 
-  if (T[80] >= 50) {
-  TDN[80] =  1.0;
-    T[80] = 50;
+  if (T[80] >= 30) {
+    TDN[80] =  1.0;
+    T[80] = 30;
   }
 
 
 
   if (N7[10] == 500) {
-  CptT[40] = true;
+    CptT[40] = true;
   }
   else {
     T[40] =  0.0;
@@ -4874,22 +4894,21 @@ void loop() {
   }
 
   if (T[40] >= 900) {
-  TDN[40] =  1.0;
+    TDN[40] =  1.0;
     T[40] = 900;
 
   }
 
   if (N7[10] == 500 ) {
-  B3[249] =   1.0;                                        //------B3:15/8
+    B3[249] =   1.0;                                        //------B3:15/8
   }
   else {
     B3[249] =   0.0;                                    //------B3:15/8    DMDE MARCHE ONDULEUR
   }
 
   if (N7[10] == 500 && F8[169] > N7[26]) {
-  CptT[50] = true;
+    CptT[50] = true;
   }
-
   else {
     T[50] =  0.0;
     TDN[50] =  0.0;
@@ -4897,25 +4916,24 @@ void loop() {
   }
 
   if (T[50] >= 400) {
-  TDN[50] =  1.0;
+    TDN[50] =  1.0;
     T[50] = 400;
-
   }
 
   if (N7[10] == 500 && F8[169] > N7[27]) {
-  B3[468] =   1.0;                                 //------B3:29/3 ALARM RACC||DEMENT ONDUL 1
+    B3[468] =   1.0;                                 //------B3:29/3 ALARM RACC||DEMENT ONDUL 1
   }
 
   if (N7[10] == 500 && F8[169] < F8[225]) {
-  F8[225] =  F8[169];                                   //CRT MAXI ONDUL 1
+    F8[225] =  F8[169];                                   //CRT MAXI ONDUL 1
   }
 
   if (N7[10] == 500 && F8[225] < N7[26]) {
-  B3[314] =   1.0;                                  //------B3:19/9 ONDUL 1 DETECTE
+    B3[314] =   1.0;                                  //------B3:19/9 ONDUL 1 DETECTE
   }
 
   if (N7[10] == 510) {
-  B3[248] =   1.0;
+    B3[248] =   1.0;
     CptT[41] = true;
   }
   else {
@@ -4926,20 +4944,20 @@ void loop() {
   }
 
   if (T[41] >= 80) {
-  TDN[41] =  1.0;
+    TDN[41] =  1.0;
     T[41] = 80;
   }
 
   if (N7[10] == 510 && TDN[41]) {
-  F8[226] =  F8[169];                       //------CRT HYSTERESIS ONDUL 1
+    F8[226] =  F8[169];                       //------CRT HYSTERESIS ONDUL 1
   }
 
   if (N7[10] == 520) {
-  F10[20] =  F8[250] * F8[254];                         //------CRT HYSTERESIS ONDUL 1
+    F10[20] =  F8[250] * F8[254];                         //------CRT HYSTERESIS ONDUL 1
   }
 
   if (N7[10] == 540) {
-  B3[255] =   1.0;                              //------B3:15/14 DMD MARCHE ONDUL 2
+    B3[255] =   1.0;                              //------B3:15/14 DMD MARCHE ONDUL 2
     CptT[42] = true;
   }
   else {
@@ -4950,13 +4968,13 @@ void loop() {
   }
 
   if (T[42] >= 900) {
-  TDN[42] =  1.0;
+    TDN[42] =  1.0;
     T[42] = 900;
   }
 
 
   if (N7[10] == 540 && F8[159] > N7[26]) {
-  CptT[51] = true;
+    CptT[51] = true;
   }
   else {
     T[51] =  0.0;
@@ -4965,24 +4983,24 @@ void loop() {
   }
 
   if (T[51] >= 400) {
-  TDN[51] =  1.0;
+    TDN[51] =  1.0;
     T[51] = 400;
   }
 
   if (N7[10] == 540 && F8[159] > N7[27]) {
-  B3[469] =   1.0;                                 //------B3:29/4 ALARM RACC||DEMENT ONDUL 2
+    B3[469] =   1.0;                                 //------B3:29/4 ALARM RACC||DEMENT ONDUL 2
   }
 
   if (N7[10] == 540 && F8[159] < F8[227]) {
-  F8[227] =  F8[159];                                   //CRT MAXI ONDUL 2
+    F8[227] =  F8[159];                                   //CRT MAXI ONDUL 2
   }
 
   if (N7[10] == 540 && F8[227] < N7[26]) {
-  B3[315] =   1.0;                                  //------B3:19/10 ONDUL 2 DETECTE
+    B3[315] =   1.0;                                  //------B3:19/10 ONDUL 2 DETECTE
   }
 
   if (N7[10] == 550) {
-  B3[256] =   1.0;
+    B3[256] =   1.0;
     CptT[43] = true;
   }
   else {
@@ -4993,20 +5011,20 @@ void loop() {
   }
 
   if (T[43] >= 80) {
-  TDN[43] =  1.0;
+    TDN[43] =  1.0;
     T[43] = 80;
   }
 
   if (N7[10] == 550 && TDN[43]) {
-  F8[228] =  F8[159];                                 //------CRT HYSTERESIS ONDUL 2
+    F8[228] =  F8[159];                                 //------CRT HYSTERESIS ONDUL 2
   }
 
   if (N7[10] == 560) {
-  F10[21] =  F8[250] * F8[254];                        //------CRT HYSTERESIS ONDUL 2
+    F10[21] =  F8[250] * F8[254];                        //------CRT HYSTERESIS ONDUL 2
   }
 
   if (N7[10] == 600) {
-  CptT[44] = true;
+    CptT[44] = true;
   }
   else {
     T[44] =  0.0;
@@ -5015,42 +5033,42 @@ void loop() {
   }
 
   if (T[44] >= 200) {
-  TDN[44] =  1.0;
+    TDN[44] =  1.0;
     T[44] = 200;
   }
 
   if (N7[10] == 600 ) {
-  B3[258] =   1.0;                                //------B3:16/1
+    B3[258] =   1.0;                                //------B3:16/1
   }
   else {
     B3[258] =   0.0;                                    //------B3:16/1    DMDE MARCHE CHARGEUR 1
   }
 
   if (N7[10] == 600 && F8[210] < N7[26]) {
-  B3[470] =   1.0;                                 //------B3:29/5 ALARM RACC||DEMENT CHARGEUR 1
+    B3[470] =   1.0;                                 //------B3:29/5 ALARM RACC||DEMENT CHARGEUR 1
   }
 
   if (N7[10] == 600 && F8[73] > F10[0]) {
-  F10[0] =  F8[73];                                   //CRT MAXI CHARGEUR 1
+    F10[0] =  F8[73];                                   //CRT MAXI CHARGEUR 1
   }
 
   if (N7[10] == 600 && F8[210] > F8[229]) {
-  F8[229] =  F8[210];                                   //CRT MAXI CHARGEUR 1
+    F8[229] =  F8[210];                                   //CRT MAXI CHARGEUR 1
   }
 
   if (N7[10] == 600 && F8[229] > N7[27]) {
-  B3[311] =   1.0;                                  //------B3:19/6 CHARG 1 DETECTE
+    B3[311] =   1.0;                                  //------B3:19/6 CHARG 1 DETECTE
   }
 
   if (N7[10] == 619 && !B3[311] ) {
-  B3[241] =   1.0;                                  //------B3:19/6 CHARG 1 DETECTE
+    B3[241] =   1.0;                                  //------B3:19/6 CHARG 1 DETECTE
   }
   else {
     B3[241] =   0.0;
   }
 
   if (N7[10] == 600 && F8[210] < N7[27] && B3[311] ) {
-  B3[234] =   1.0;                                  //------B3:19/6 CHARG 1 DETECTE
+    B3[234] =   1.0;                                  //------B3:19/6 CHARG 1 DETECTE
   }
   else {
     B3[234] =   0.0;
@@ -5058,7 +5076,7 @@ void loop() {
 
 
   if (B3[311]) {//-cond ons
-  if (!B3[24]) {  //---bit ons
+    if (!B3[24]) {  //---bit ons
       B3[24] = 1;
       N7[19] = T[44] / 10;
     }
@@ -5070,7 +5088,7 @@ void loop() {
 
 
   if (N7[10] == 620) {
-  B3[259] =   1.0;
+    B3[259] =   1.0;
     CptT[45] = true;
   }
   else {
@@ -5081,32 +5099,32 @@ void loop() {
   }
 
   if (T[45] >= 30) {
-  TDN[45] =  1.0;
+    TDN[45] =  1.0;
     T[45] = 30;
   }
 
   if (N7[10] == 620 && F8[210] < 0.2 ) {
-  F10[1] =  F8[73];                                //------MEM uU BATT A CRT MINI CHARGEUR 1
+    F10[1] =  F8[73];                                //------MEM uU BATT A CRT MINI CHARGEUR 1
   }
 
   if (N7[10] == 620) {
-  F10[2] =  F10[0] - F10[1];                                //------DIFF U BATT ENTRE CHARG MAX ET 0 CHARG
+    F10[2] =  F10[0] - F10[1];                                //------DIFF U BATT ENTRE CHARG MAX ET 0 CHARG
   }
 
   if (N7[10] == 620 && F8[229] > 0.0 && B3[311]) {
-  F10[3] =  F10[2] / F8[229];                                //------RESIST OHM CIRCUIT PUISS AVEC CHAGEUR 1
+    F10[3] =  F10[2] / F8[229];                                //------RESIST OHM CIRCUIT PUISS AVEC CHAGEUR 1
   }
 
   if (N7[10] == 620 && TDN[45]) {
-  F8[230] =  F8[209];                                            //------CRT HYSTERESIS CHARG 1
+    F8[230] =  F8[209];                                            //------CRT HYSTERESIS CHARG 1
   }
 
   if (N7[10] == 630) {
-  F10[15] =  F8[254] * F8[250];                                //------MEMO HYST CHARG 1 BATT CHARG
+    F10[15] =  F8[254] * F8[250];                                //------MEMO HYST CHARG 1 BATT CHARG
   }
 
   if (N7[10] == 650) {
-  B3[262] =   1.0;                                         //------B3:16/5                       DMD MARCHE CHARG 2
+    B3[262] =   1.0;                                         //------B3:16/5                       DMD MARCHE CHARG 2
     CptT[46] = true;
   }
   else {
@@ -5117,28 +5135,28 @@ void loop() {
   }
 
   if (T[46] >= 200) {
-  TDN[46] =  1.0;
+    TDN[46] =  1.0;
     T[46] = 200;
   }
 
   if (N7[10] == 650 && F8[199] < N7[26]) {
-  B3[471] =   1.0;                                 //------B3:29/6 ALARM RACC||DEMENT CHARG 2
+    B3[471] =   1.0;                                 //------B3:29/6 ALARM RACC||DEMENT CHARG 2
   }
 
   if (N7[10] == 650 && F8[73] > F10[5]) {
-  F10[5] =  F8[73];                                   //CRT MAXI CHARG 2
+    F10[5] =  F8[73];                                   //CRT MAXI CHARG 2
   }
 
   if (N7[10] == 650 && F8[199] > F8[231]) {
-  F8[231] =  F8[199];                                   //CRT MAXI CHARG 2
+    F8[231] =  F8[199];                                   //CRT MAXI CHARG 2
   }
 
   if (N7[10] == 650 && F8[231] > N7[27]) {
-  B3[312] =   1.0;                                  //------B3:19/7 CHARG 2 DETECTE
+    B3[312] =   1.0;                                  //------B3:19/7 CHARG 2 DETECTE
   }
 
   if (N7[10] == 659 && !B3[312] ) {
-  B3[242] =   1.0;                                  //------B3:19/6 CHARG 2 DETECTE
+    B3[242] =   1.0;                                  //------B3:19/6 CHARG 2 DETECTE
   }
   else {
     B3[242] =   0.0;
@@ -5146,14 +5164,14 @@ void loop() {
 
 
   if (N7[10] == 650 && F8[199] < N7[27] && B3[312] ) {
-  B3[235] =   1.0;                                  //------B3:19/6 CHARG 2 DETECTE
+    B3[235] =   1.0;                                  //------B3:19/6 CHARG 2 DETECTE
   }
   else {
     B3[235] =   0.0;
   }
 
   if (B3[312]) {//-cond ons
-  if (!B3[25]) {  //---bit ons
+    if (!B3[25]) {  //---bit ons
       B3[25] = 1;
       N7[18] = T[44] / 10;
     }
@@ -5164,7 +5182,7 @@ void loop() {
 
 
   if (N7[10] == 660) {
-  B3[263] =   1.0;
+    B3[263] =   1.0;
     CptT[47] = true;
   }
   else {
@@ -5175,33 +5193,33 @@ void loop() {
   }
 
   if (T[47] >= 30) {
-  TDN[47] =  1.0;
+    TDN[47] =  1.0;
     T[47] = 30;
   }
 
   if (N7[10] == 660 && F8[199] < 0.2 ) {
-  F10[6] =  F8[73];                                //------MEM uU BATT A CRT MINI CHARGEUR 2
+    F10[6] =  F8[73];                                //------MEM uU BATT A CRT MINI CHARGEUR 2
   }
 
   if (N7[10] == 660) {
-  F10[7] =  F10[5] - F10[6];                                //------DIFF U BATT ENTRE CHARG MAX ET 0 CHARG
+    F10[7] =  F10[5] - F10[6];                                //------DIFF U BATT ENTRE CHARG MAX ET 0 CHARG
   }
 
   if (N7[10] == 660 && F8[231] > 0.0 && B3[312]) {
-  F10[8] =  F10[7] / F8[231];                                //------RESIST OHM CIRCUIT PUISS AVEC CHAGEUR 2
+    F10[8] =  F10[7] / F8[231];                                //------RESIST OHM CIRCUIT PUISS AVEC CHAGEUR 2
   }
 
   if (N7[10] == 660 && TDN[47]) {
-  F8[232] =  F8[199];  //------CRT HYSTERESIS ONDUL 2
+    F8[232] =  F8[199];  //------CRT HYSTERESIS ONDUL 2
   }
 
   if (N7[10] == 670) {
-  F10[16] =  F8[250] * F8[254];  //------MEMO HYST CHARG 2 BATT CHARG
+    F10[16] =  F8[250] * F8[254];  //------MEMO HYST CHARG 2 BATT CHARG
   }
 
 
   if ((N7[10] >= 600 && N7[10] <= 620) || ( N7[10] >= 650 && N7[10] <= 660)) {
-  B3[5] =   1.0; // bit fast execution arduino
+    B3[5] =   1.0; // bit fast execution arduino
   }
   else {
     B3[5] =   0.0;
@@ -5210,7 +5228,7 @@ void loop() {
 
 
   if (N7[10] == 700) {
-  B3[269] =   1.0;
+    B3[269] =   1.0;
     CptT[48] = true;
 
   }
@@ -5221,32 +5239,32 @@ void loop() {
     CptT[48] = false;
   }
   if (T[48] >= 100) {
-  TDN[48] =  1.0;
+    TDN[48] =  1.0;
     T[48] = 100;
   }
 
   if (N7[10] == 700 && F8[189] < N7[26] ) {
-  B3[472] =  1.0;                                //b3;29/7------anomalie cablage pv1
+    B3[472] =  1.0;                                //b3;29/7------anomalie cablage pv1
   }
 
   if (N7[10] == 700 && F8[181] > N7[8] ) {
-  N7[8] =  F8[181];                                //------mesure puiss pv1
+    N7[8] =  F8[181];                                //------mesure puiss pv1
   }
 
   if (N7[10] == 700 && N7[8] > N7[28] ) {
-  B3[308] =  1.0;                                //B3;19/3------anomalie cablage pv1
+    B3[308] =  1.0;                                //B3;19/3------anomalie cablage pv1
   }
 
 
   if (N7[10] == 720 && !B3[308] ) {
-  B3[243] =  1.0;                                //b3;29/8------anomalie cablage pv2
+    B3[243] =  1.0;                                //b3;29/8------anomalie cablage pv2
   }
   else {
     B3[243] =  0.0;
   }
 
   if (N7[10] == 720) {
-  B3[270] =   1.0;
+    B3[270] =   1.0;
     CptT[49] = true;
   }
   else {
@@ -5256,25 +5274,25 @@ void loop() {
     CptT[49] = false;
   }
   if (T[49] >= 100) {
-  TDN[49] =  1.0;
+    TDN[49] =  1.0;
     T[49] = 100;
   }
 
 
   if (N7[10] == 720 && F8[179] < N7[26] ) {
-  B3[473] =  1.0;                                //b3;29/8------anomalie cablage pv2
+    B3[473] =  1.0;                                //b3;29/8------anomalie cablage pv2
   }
 
   if (N7[10] == 720 && F8[171] > N7[9] ) {
-  N7[9] =  F8[171];                                //------mesure puiss pv1
+    N7[9] =  F8[171];                                //------mesure puiss pv1
   }
 
   if (N7[10] == 720 && N7[9] > N7[28] ) {
-  B3[309] =  1.0;                                //B3;19/4------anomalie cablage pv1
+    B3[309] =  1.0;                                //B3;19/4------anomalie cablage pv1
   }
 
   if (N7[10] == 790 && !B3[309] ) {
-  B3[244] =  1.0;                                //b3;29/8------anomalie cablage pv2
+    B3[244] =  1.0;                                //b3;29/8------anomalie cablage pv2
   }
   else {
     B3[244] =  0.0;
@@ -5282,14 +5300,14 @@ void loop() {
 
 
   if (F8[145] > 556 || F8[145] < 456) {
-  B3[449] =   1.0;                                     //------B3:28/0
+    B3[449] =   1.0;                                     //------B3:28/0
   }
   else {
     B3[449] =   0.0;                                    //------B3:28/0    alarm offset hall bat 1
   }
 
   if (buttonPin45Num >= 4 && (F8[245] > 556 || F8[245] < 456)) {
-  B3[450] =   1.0;                                     //------B3:28/1
+    B3[450] =   1.0;                                     //------B3:28/1
   }
   else {
     B3[450] =   0.0;                                    //------B3:28/1    alarm offset hall bat 2
@@ -5297,58 +5315,59 @@ void loop() {
 
 
   if (F8[165] > 556 || F8[165] < 456) {
-  B3[452] =   1.0;                                     //------B3:28/3
+    B3[452] =   1.0;                                     //------B3:28/3
   }
   else {
     B3[452] =   0.0;                                    //------B3:28/3    alarm offset hall ondul 1
   }
 
   if (F8[155] > 556 || F8[155] < 456) {
-  B3[453] =   1.0;                                     //------B3:28/4
+    B3[453] =   1.0;                                     //------B3:28/4
   }
   else {
     B3[453] =   0.0;                                    //------B3:28/4    alarm offset hall ondul 2
   }
 
   if (F8[185] > 556 || F8[185] < 456) {
-  B3[454] =   1.0;                                     //------B3:28/5
+    B3[454] =   1.0;                                     //------B3:28/5
   }
   else {
     B3[454] =   0.0;                                    //------B3:28/5    alarm offset hall pv 1
   }
 
   if (F8[175] > 556 || F8[175] < 456) {
-  B3[455] =   1.0;                                     //------B3:28/6
+    B3[455] =   1.0;                                     //------B3:28/6
   }
   else {
     B3[455] =   0.0;                                    //------B3:28/6    alarm offset hall pv 2
   }
 
   if (F8[205] > 556 || F8[205] < 456) {
-  B3[456] =   1.0;                                     //------B3:28/7
+    B3[456] =   1.0;                                     //------B3:28/7
   }
   else {
     B3[456] =   0.0;                                    //------B3:28/7    alarm offset hall charg 1
   }
   if (F8[195] > 556 || F8[195] < 456) {
-  B3[457] =   1.0;                                     //------B3:28/8
+    B3[457] =   1.0;                                     //------B3:28/8
   }
   else {
     B3[457] =   0.0;                                    //------B3:28/8    alarm offset hall charg 2
   }
 
   // FIN PRG AUTOCONFIG
+
   //-----------------------------------------------------------MOUCHARD PUISSANCE FIN DE CHARGE
   if (F8[60] > F8[95]) {
-  F8_60_LIM = 1;
-}
-else {
-  F8_60_LIM = 0;
-}
-B3[9] = B3[12] + F8_60_LIM + ST2;
-switch (B3[9]) {
-  case 5:
-    if (B3_9_MEMO == 0) {
+    F8_60_LIM = 1;
+  }
+  else {
+    F8_60_LIM = 0;
+  }
+  B3[9] = B3[12] + F8_60_LIM + ST2;
+  switch (B3[9]) {
+    case 5:
+      if (B3_9_MEMO == 0) {
         F8[114] = N7[59];
       }
       B3_9_MEMO = 1;
@@ -5359,15 +5378,57 @@ switch (B3[9]) {
   }
 
   if (B3[31] && T1Cent ) {
-  T1Cent = 0;
-  B3[31] = 0;
+    T1Cent = 0;
+    B3[31] = 0;
   }
 
+  //--------------------------------------------------------21 EXTERNE-------------------------------------------------
+  if (N7[80] != N7[81] && ( N7[81] == 0.0 ||  N7[80] == 0.0)) {
+    N7[81] = N7[80];
+  }
+  if (N7[81] > 0) {
+    CptT[35] = true;
+  }
+  else {
+    T[35] =  0.0;
+    TDN[35] =  0.0;
+    CptT[35] = false;
+  }
 
+  if (T[35] >= 3000) {
+    TDN[35] =  1.0;
+    T[35] = 3000;
+  }
+
+  if (TDN[35] || N7[80] == 0) {
+    N7[81] = 0;
+  }
+  if (N7[81] == 1) {
+    B3[161] = 1;
+  }
+  else {
+    B3[161] = 0;
+  }
+
+  if (B3[161] &&  N7[60] < N7[89]) {
+    N7[80] = 0;
+  }
+  if (N7[81] == 2) {
+    B3[162] = 1;
+  }
+  if (N7[81] == 3) {
+    B3[163] = 1;
+  }
+  if (N7[81] == 4) {
+    B3[164] = 1;
+  }
+  if (B3[164] && N7[60] > N7[89]) {
+    N7[80] = 0;
+  }
   //------------------------------------------------------03-PRG SEQUENCE----------------------------------
 
   if (buttonPin39Num >= 4 || buttonPin38Num >= 4) {
-  B3[178] = 1;
+    B3[178] = 1;
   }
   else {
     B3[178] = 0;
@@ -5375,7 +5436,7 @@ switch (B3[9]) {
 
 
   if (buttonPin31Num >= 4) {
-  CptT[10] = true;
+    CptT[10] = true;
   }
   else {
     T[10] =  0.0;
@@ -5384,12 +5445,12 @@ switch (B3[9]) {
   }
 
   if (T[10] >= 10) {
-  TDN[10] =  1.0;
+    TDN[10] =  1.0;
     T[10] = 10;
   }
 
   if (buttonPin29Num >= 4) {
-  CptT[11] = true;
+    CptT[11] = true;
   }
   else {
     T[11] =  0.0;
@@ -5398,12 +5459,12 @@ switch (B3[9]) {
   }
 
   if (T[11] >= 10) {
-  TDN[11] =  1.0;
+    TDN[11] =  1.0;
     T[11] = 10;
   }
 
   if (buttonPin27Num >= 4) {
-  CptT[12] = true;
+    CptT[12] = true;
   }
   else {
     T[12] =  0.0;
@@ -5412,13 +5473,13 @@ switch (B3[9]) {
   }
 
   if (T[12] >= 0) {
-  TDN[12] =  1.0;
+    TDN[12] =  1.0;
     T[12] = 0;
   }
 
 
   if (buttonPin27Num >= 4) {
-  T[13] =  0.0;
+    T[13] =  0.0;
     TDN[13] =  1.0;
     CptT[13] = false;
   }
@@ -5427,12 +5488,12 @@ switch (B3[9]) {
   }
 
   if (T[13] >= 1.0) {
-  TDN[13] =  0.0;
+    TDN[13] =  0.0;
     T[13] = 1.0;
   }
 
   if (buttonPin25Num >= 4) {
-  CptT[14] = true;
+    CptT[14] = true;
   }
   else {
     T[14] =  0.0;
@@ -5441,12 +5502,12 @@ switch (B3[9]) {
   }
 
   if (T[14] >= 0) {
-  TDN[14] =  1.0;
+    TDN[14] =  1.0;
     T[14] = 0;
   }
 
   if (buttonPin25Num >= 4) {
-  T[15] =  0.0;
+    T[15] =  0.0;
     TDN[15] =  1.0;
     CptT[15] = false;
   }
@@ -5455,12 +5516,12 @@ switch (B3[9]) {
   }
 
   if (T[15] >= 1.0) {
-  TDN[15] =  0.0;
+    TDN[15] =  0.0;
     T[15] = 1.0;
   }
 
   if (buttonPin23Num >= 4) {
-  T[16] =  0.0;
+    T[16] =  0.0;
     TDN[16] =  1.0;
     CptT[16] = false;
   }
@@ -5469,51 +5530,47 @@ switch (B3[9]) {
   }
 
   if (T[16] >= 0.0) {
-  TDN[16] =  0.0;
+    TDN[16] =  0.0;
     T[16] = 0.0;
   }
   if (N7[100] == 0 && TDN[10] && !B3[210] && !TDN[13] && !B3[177] ) {
-  N7[100] = 10;
+    N7[100] = 10;
   }
   if ((N7[100] == 10) && (!TDN[10] || B3[177]))  {
-  N7[100] = 0;
+    N7[100] = 0;
   }
   if (N7[101] == 0 && TDN[11] && !B3[209] && !TDN[13] ) {
-  N7[101] = 10;
+    N7[101] = 10;
   }
   if (N7[101] == 10 && ((TDN[10] && !B3[177]) || !TDN[11])) {
-  N7[101] = 0;
+    N7[101] = 0;
   }
 
 
 
   if (N7[102] == 0 && TDN[12] && !B3[212] && !TDN[15] ) {
-  N7[102] = 10;
+    N7[102] = 10;
   }
 
 
 
   if (N7[102] == 10 && !TDN[12] && !TDN[10] && !(TDN[11]) ) {
-  N7[102] = 0;
+    N7[102] = 0;
   }
   if (N7[103] == 0 && TDN[16] && !B3[211] && !TDN[15] && !TDN[13] && !TDN[10] && !TDN[11]) {
-  N7[103] = 10;
+    N7[103] = 10;
   }
   if (N7[103] == 10 && TDN[12] ) {
-  N7[103] = 0;
+    N7[103] = 0;
   }
-  if (!B3[209] && buttonPin31Num >= 4 && buttonPin27Num >= 4 ) {
-  B3[108] = 1;
+  if (!B3[209] && buttonPin31Num >= 4 && buttonPin27Num >= 4 && !B3[304]) {
+    B3[108] = 1;
   }
   else {
     B3[108] = 0;
   }
-
-
-
-
   if ((((!B3[304] && N7[100] == 10 && !B3[210]) || B3[266]) && TDN[0]) && !B3[108])  {
-  B3[209] = 1;
+    B3[209] = 1;
   }
   else {
     B3[209] = 0;
@@ -5521,15 +5578,17 @@ switch (B3[9]) {
 
 
 
-  if (B3[209] && B3[178])  {
-  PWM4 = 1;
-}
-else {
-  PWM4 = 0;
-}
+  if (B3[209] && !B3[178])  {
+    PWM4 = 1;
+    digitalWrite(LED4, HIGH);
+  }
+  else {
+    PWM4 = 0;
+    digitalWrite(LED4, LOW);
+  }
 
-if (!B3[210] && buttonPin29Num >= 4 && buttonPin27Num >= 4 ) {
-  B3[107] = 1;
+  if (!B3[210] && buttonPin29Num >= 4 && buttonPin27Num >= 4 ) {
+    B3[107] = 1;
   }
   else {
     B3[107] = 0;
@@ -5539,431 +5598,140 @@ if (!B3[210] && buttonPin29Num >= 4 && buttonPin27Num >= 4 ) {
 
 
   if ((((!B3[304] && N7[101] == 10 && !B3[209]) || B3[267]) && TDN[0]) && !B3[107])  {
-  B3[210] = 1;
+    B3[210] = 1;
   }
   else {
     B3[210] = 0;
   }
 
-  if (B3[210] && B3[178])  {
-  PWM5 = 1; //relaiis grid pwm5
-}
-else {
-  PWM5 = 0;
-}
+  if (B3[210] && !B3[178])  {
+    PWM5 = 1;
+    digitalWrite(LED5, HIGH);
+  }
+  else {
+    PWM5 = 0;
+    digitalWrite(LED5, LOW);
+  }
 
-if (!B3[211] && buttonPin25Num >= 4 ) {
-  B3[106] = 1;
+  if (!B3[211] && buttonPin25Num >= 4 && !B3[304] ) {
+    B3[106] = 1;
   }
   else {
     B3[106] = 0;
   }
+
   if (((!B3[304] && N7[102] == 10) || (B3[304] && TDN[80]) || (B3[304] && B3[268])) && !B3[212] && TDN[0] && !B3[106] ) {
-  B3[211] = 1;
+    B3[211] = 1;
   }
   else {
     B3[211] = 0;
   }
 
-  if (B3[211] && B3[178])  {
-  PWM6 = 1; //relaiis grid pwm6
-}
-else {
-  PWM6 = 0;
-}
-if (!B3[212] && buttonPin25Num >= 4 ) {
-  B3[105] = 1;
+  if (B3[211] && !B3[178])  {
+    PWM6 = 1;
+    digitalWrite(LED6, HIGH);
+  }
+  else {
+    PWM6 = 0;
+    digitalWrite(LED6, LOW);
+  }
+  if (!B3[212] && buttonPin25Num >= 4 ) {
+    B3[105] = 1;
   }
   else {
     B3[105] = 0;
   }
   if (buttonPin31Num < 4 && buttonPin27Num < 4 && buttonPin29Num < 4 && !B3[209] && !B3[210] && !B3[211] ) {
-  B3[109] = 1;
+    B3[109] = 1;
   }
   else {
     B3[109] = 0;
   }
   if (!B3[304] && N7[103] == 10 && !B3[211] && B3[109] && TDN[0] && !B3[105] ) {
-  B3[212] = 1;
+    B3[212] = 1;
   }
   else {
     B3[212] = 0;
   }
-  if (B3[212] && B3[178] ) {
-  PWM7 = 1; //relaiis grid pwm7
-}
-else {
-  PWM7 = 0;
-}
-if (B3[209]) {
+  if (B3[212] && !B3[178] ) {
+    PWM7 = 1;
+    //digitalWrite(LED7, HIGH);
+  }
+  else {
+    PWM7 = 0;
+    //digitalWrite(LED7, LOW);
+  }
+  if (B3[209]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[210]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[211]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[212]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[213]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[214]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[215]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   if (B3[216]) {
 
-  N7[30] = N7[30] + 1;
+    N7[30] = N7[30] + 1;
   }
   N7[31] = N7[30];
-           N7[30] = 0;
+  N7[30] = 0;
 
-           //FIN SEQUENCE
-           //-----------------------------------------------
-           MessTraitement();
-           Ecriture ();// tablette vers arduino
-           Lecture (); // arduino vers tablette
+  //FIN SEQUENCE
+  //-----------------------------------------------
+  MessTraitement();
+  Ecriture ();// tablette vers arduino
+  Lecture (); // arduino vers tablette
 
-           //Gemunolink ();
+  //Gemunolink ();
 
-           //scanning
+  //scanning
   if (CptT[70]) {
-  F10[130] = F10[130] + 1;
+    F10[130] = F10[130] + 1;
   }
   if (TDN[70]) {
-  F10[131] = F10[130] / 4;
+    F10[131] = F10[130] / 4;
     F10[130] = 0;
   }
 
   //Calcul du temps de cycle
   cycleTime = millis() - T1SetUp;
-              Cycle = cycleTime - CyclePrescedent;
-              CyclePrescedent = cycleTime;
-              //Serial.println(Cycle);
+  Cycle = cycleTime - CyclePrescedent;
+  CyclePrescedent = cycleTime;
+  //Serial.println(Cycle);
 
   if (FirstScan == 1) {
-  //..............
+    //..............
+  }
+  else {
+
+  }
+
+  FirstScan = 0;
+
+  //AffProcessing();
+
+
 }
-else {
-
-}
-
-FirstScan = 0;
-
-            //--------------------------------------------------------------------AFFICHAGE PROCESSING
-
-            //  while (Serial.available() > 0) { // si un caractère en réception
-            //
-            //    octetReceptionProc = Serial.read(); // lit le 1er octet de la file d'attente
-            //
-            //    if (octetReceptionProc == '/') {
-            //      if (chaineReceptionProc.substring(0, 2) == "F8")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(2);
-            //        IndexDebugProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 2) == "N7")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(2);
-            //        IndexDebugNProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 3) == "F10")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(3);
-            //        IndexDebugFProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 2) == "B3")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(2);
-            //        IndexDebugBProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 1) == "T")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(1);
-            //        IndexDebugTProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 3) == "TDN")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(3);
-            //        IndexDebugTDProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 2) == "TT")  {
-            //        String InStringProc;
-            //        InStringProc = chaineReceptionProc.substring(2);
-            //        IndexDebugTTProc = InStringProc.toFloat();
-            //      }
-            //      if (chaineReceptionProc.substring(0, 3) == "VAR")  {
-            //        String InStringProc;
-            //        InStringProc = (chaineReceptionProc.substring(3));
-            //        Pointeur = InStringProc;
-            //      }
-            //      if (chaineReceptionProc.substring(0, 6) == "OKPROC")  {
-            //        Processing = true;
-            //      }
-            //      chaineReceptionProc = "";
-            //      //delay(1); // pause
-            //    }
-            //    else {
-            //      caractereReceptionProc = char(octetReceptionProc);
-            //      chaineReceptionProc = chaineReceptionProc + caractereReceptionProc;
-            //      //delay(1);
-            //    }
-            //  }
-            //  if (Processing) {
-            //    dtostrf( F8[IndexDebugProc], 5, 3, charVal);
-            //    TramProc = charVal;
-            //    TramProc = TramProc + "/";
-            //
-            //    dtostrf( N7[IndexDebugNProc], 5, 0, charVal);
-            //    TramProc = TramProc + charVal;
-            //    TramProc = TramProc + "/";
-            //
-            //    dtostrf( F10[IndexDebugFProc], 5, 3, charVal);
-            //    TramProc = TramProc + charVal;
-            //    TramProc = TramProc + "/";
-            //
-            //    dtostrf( B3[IndexDebugBProc], 5, 0, charVal);
-            //    TramProc = TramProc + charVal;
-            //    TramProc = TramProc + "/";
-            //
-            //    dtostrf( T[IndexDebugTProc], 5, 0, charVal);
-            //    TramProc = TramProc + charVal;
-            //    TramProc = TramProc + "/";
-            //
-            //    TramProc = TramProc + IndexDebugProc;
-            //    TramProc = TramProc + "/";
-            //
-            //    TramProc = TramProc + IndexDebugNProc;
-            //    TramProc = TramProc + "/";
-            //
-            //    TramProc = TramProc + IndexDebugFProc;
-            //    TramProc = TramProc + "/";
-            //
-            //    TramProc = TramProc + IndexDebugBProc;
-            //    TramProc = TramProc + "/";
-            //
-            //    TramProc = TramProc + IndexDebugTProc;
-            //    TramProc = TramProc + "/";
-            //
-            //    Serial.print(TramProc);
-            //
-            //    Serial.print("T1= ");
-            //    Serial.print(T1);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T2= ");
-            //    Serial.print(T2);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T3= ");
-            //    Serial.print(T3);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T4= ");
-            //    Serial.print(T4);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T5= ");
-            //    Serial.print(T5);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T6= ");
-            //    Serial.print(T6);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T7= ");
-            //    Serial.print(T7);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T8= ");
-            //    Serial.print(T8);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T9= ");
-            //    Serial.print(T9);
-            //    Serial.print("/");
-            //
-            //    Serial.print("T10= ");
-            //    Serial.print(T10);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST1= ");
-            //    Serial.print(ST1);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST2= ");
-            //    Serial.print(ST2);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST3= ");
-            //    Serial.print(ST3);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST4= ");
-            //    Serial.print(ST4);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST5= ");
-            //    Serial.print(ST5);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST6= ");
-            //    Serial.print(ST6);
-            //    Serial.print("/");
-            //
-            //    Serial.print("ST7= ");
-            //    Serial.print(ST7);
-            //    Serial.print("/");
-            //
-            //    Serial.print("DN70]= ");
-            //    Serial.print(TDN[70]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("DN72]= ");
-            //    Serial.print(TDN[72]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("DN71]= ");
-            //    Serial.print(TDN[71]);
-            //    Serial.print("/");
-            //
-            //
-            //    f|| (int i = 23; i <= 35; i = i + 2) {
-            //      Serial.print("IN");
-            //      Serial.print(i);
-            //      Serial.print("=");
-            //      Serial.print(digitalRead(i));
-            //      Serial.print("/");
-            //    }
-            //    f|| (int i = 37; i <= 52; i = i + 1) {
-            //      Serial.print("IN");
-            //      Serial.print(i);
-            //      Serial.print("=");
-            //      Serial.print(digitalRead(i));
-            //      Serial.print("/");
-            //    }
-            //    f|| (int i = 209; i <= 224; i = i + 1) {
-            //      Serial.print("OUT");
-            //      Serial.print(i);
-            //      Serial.print("=");
-            //      Serial.print(B3[i]);
-            //      Serial.print("/");
-            //    }
-            //
-            //    f|| (int i = 0; i <= 15; i = i + 1) {
-            //      Serial.print("AI");
-            //      Serial.print(i);
-            //      Serial.print("=");
-            //      Serial.print(analogRead(i));
-            //      Serial.print("/");
-            //    }
-            //
-            //    Serial.print("T.BATT1= ");
-            //    Serial.print(F8[69]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.BATT1= ");
-            //    Serial.print(F8[52]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.MPPT1= ");
-            //    Serial.print(F8[187]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.MPPT2= ");
-            //    Serial.print(F8[177]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.CHARG1= ");
-            //    Serial.print(F8[207]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.CHARG2= ");
-            //    Serial.print(F8[197]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.ONDUL1= ");
-            //    Serial.print(F8[167]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I.ONDUL2= ");
-            //    Serial.print(F8[157]);
-            //    Serial.print("/");
-            //
-            //
-            //    Serial.print("I.BATT2= ");
-            //    Serial.print(F8[247]);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I N7:60= ");
-            //    Serial.print(N7M60);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I F8:161= ");
-            //    Serial.print(F8M161);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I F8:132= ");
-            //    Serial.print(F8M132);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I F8:125= ");
-            //    Serial.print(F8M125);
-            //    Serial.print("/");
-            //
-            //    Serial.print("I F8:105= ");
-            //    Serial.print(F8M105);
-            //    Serial.print("/");
-            //
-            //    dtostrf( TDN[IndexDebugTDProc], 1, 0, charVal);
-            //    TramProc = charVal;
-            //    TramProc = TramProc + "/";
-            //    Serial.print(TramProc);
-            //
-            //    dtostrf( TDN[IndexDebugTTProc], 1, 0, charVal);
-            //    TramProc = charVal;
-            //    TramProc = TramProc + "/";
-            //    Serial.print(TramProc);
-            //
-            //    Serial.print("IN22= ");
-            //    Serial.print(digitalRead(22));
-            //    Serial.print("/");
-            //
-            //    Serial.print("TDN[70]= ");
-            //    Serial.print(TDN[70]);
-            //    Serial.print("/");
-            //
-            //    dtostrf( N7[90], 1, 0, charVal);
-            //    TramProc = charVal;
-            //    TramProc = TramProc + "/";
-            //    Serial.print(TramProc);
-            //
-            //    AffPointeur(Pointeur);
-            //
-            //    Serial.println();
-            //
-            //    // Tjrs fin de programme
-            //    /*if (B3[31] && T1Cent ) {
-            //      T1Cent = 0;
-            //      B3[31] = 0;
-            //    }*/
-            //  }
-            //
-}
-
-
 
 //==========================================================
 String SMS_Receive()
@@ -7303,23 +7071,6 @@ void Scanin() {
 void MessTraitement() {
 
   byte MessInByte;
-
-
-  // if (MessOut == 0) {
-  //    CptT[3] = true;
-  //  }
-  //  else {
-  //    T[3] =  0.0;
-  //    TDN[3] =  0.0;
-  //    CptT[3] = false;
-  //  }
-  //  if (T[3] >= 50) {
-  //    TDN[3] =  1.0;
-  //    T[3] = 50;
-  //    CptT[3] = false;
-  //  }
-
-
   if (MessOut == 0 ) {
     MessIn1 = N7[90];
     if (MessInMemo1 != MessIn1) {
@@ -7423,6 +7174,9 @@ void callback() {
   }
   if (CptT[34]) {
     T[34] =  T[34] + 1.0;
+  }
+  if (CptT[35]) {
+    T[35] =  T[35] + 1.0;
   }
   if (CptT[36]) {
     T[36] =  T[36] + 1.0;
@@ -7790,3 +7544,296 @@ void PasMessage() {
   }
 }
 
+//--------------------------------------------------------------------AFFICHAGE PROCESSING
+//void AffProcessing(){
+//     while (Serial.available() > 0) { // si un caractère en réception
+//
+//      octetReceptionProc = Serial.read(); // lit le 1er octet de la file d'attente
+//
+//      if (octetReceptionProc == '/') {
+//        if (chaineReceptionProc.substring(0, 2) == "F8")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(2);
+//          IndexDebugProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 2) == "N7")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(2);
+//          IndexDebugNProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 3) == "F10")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(3);
+//          IndexDebugFProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 2) == "B3")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(2);
+//          IndexDebugBProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 1) == "T")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(1);
+//          IndexDebugTProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 3) == "TDN")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(3);
+//          IndexDebugTDProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 2) == "TT")  {
+//          String InStringProc;
+//          InStringProc = chaineReceptionProc.substring(2);
+//          IndexDebugTTProc = InStringProc.toFloat();
+//        }
+//        if (chaineReceptionProc.substring(0, 3) == "VAR")  {
+//          String InStringProc;
+//          InStringProc = (chaineReceptionProc.substring(3));
+//          Pointeur = InStringProc;
+//        }
+//        if (chaineReceptionProc.substring(0, 6) == "OKPROC")  {
+//          Processing = true;
+//        }
+//        chaineReceptionProc = "";
+//        //delay(1); // pause
+//      }
+//      else {
+//        caractereReceptionProc = char(octetReceptionProc);
+//        chaineReceptionProc = chaineReceptionProc + caractereReceptionProc;
+//        //delay(1);
+//      }
+//    }
+//    if (Processing) {
+//      dtostrf( F8[IndexDebugProc], 5, 3, charVal);
+//      TramProc = charVal;
+//      TramProc = TramProc + "/";
+//
+//      dtostrf( N7[IndexDebugNProc], 5, 0, charVal);
+//      TramProc = TramProc + charVal;
+//      TramProc = TramProc + "/";
+//
+//      dtostrf( F10[IndexDebugFProc], 5, 3, charVal);
+//      TramProc = TramProc + charVal;
+//      TramProc = TramProc + "/";
+//
+//      dtostrf( B3[IndexDebugBProc], 5, 0, charVal);
+//      TramProc = TramProc + charVal;
+//      TramProc = TramProc + "/";
+//
+//      dtostrf( T[IndexDebugTProc], 5, 0, charVal);
+//      TramProc = TramProc + charVal;
+//      TramProc = TramProc + "/";
+//
+//      TramProc = TramProc + IndexDebugProc;
+//      TramProc = TramProc + "/";
+//
+//      TramProc = TramProc + IndexDebugNProc;
+//      TramProc = TramProc + "/";
+//
+//      TramProc = TramProc + IndexDebugFProc;
+//      TramProc = TramProc + "/";
+//
+//      TramProc = TramProc + IndexDebugBProc;
+//      TramProc = TramProc + "/";
+//
+//      TramProc = TramProc + IndexDebugTProc;
+//      TramProc = TramProc + "/";
+//
+//      Serial.print(TramProc);
+//
+//      Serial.print("T1= ");
+//      Serial.print(T1);
+//      Serial.print("/");
+//
+//      Serial.print("T2= ");
+//      Serial.print(T2);
+//      Serial.print("/");
+//
+//      Serial.print("T3= ");
+//      Serial.print(T3);
+//      Serial.print("/");
+//
+//      Serial.print("T4= ");
+//      Serial.print(T4);
+//      Serial.print("/");
+//
+//      Serial.print("T5= ");
+//      Serial.print(T5);
+//      Serial.print("/");
+//
+//      Serial.print("T6= ");
+//      Serial.print(T6);
+//      Serial.print("/");
+//
+//      Serial.print("T7= ");
+//      Serial.print(T7);
+//      Serial.print("/");
+//
+//      Serial.print("T8= ");
+//      Serial.print(T8);
+//      Serial.print("/");
+//
+//      Serial.print("T9= ");
+//      Serial.print(T9);
+//      Serial.print("/");
+//
+//      Serial.print("T10= ");
+//      Serial.print(T10);
+//      Serial.print("/");
+//
+//      Serial.print("ST1= ");
+//      Serial.print(ST1);
+//      Serial.print("/");
+//
+//      Serial.print("ST2= ");
+//      Serial.print(ST2);
+//      Serial.print("/");
+//
+//      Serial.print("ST3= ");
+//      Serial.print(ST3);
+//      Serial.print("/");
+//
+//      Serial.print("ST4= ");
+//      Serial.print(ST4);
+//      Serial.print("/");
+//
+//      Serial.print("ST5= ");
+//      Serial.print(ST5);
+//      Serial.print("/");
+//
+//      Serial.print("ST6= ");
+//      Serial.print(ST6);
+//      Serial.print("/");
+//
+//      Serial.print("ST7= ");
+//      Serial.print(ST7);
+//      Serial.print("/");
+//
+//      Serial.print("DN70]= ");
+//      Serial.print(TDN[70]);
+//      Serial.print("/");
+//
+//      Serial.print("DN72]= ");
+//      Serial.print(TDN[72]);
+//      Serial.print("/");
+//
+//      Serial.print("DN71]= ");
+//      Serial.print(TDN[71]);
+//      Serial.print("/");
+//
+//
+//      f|| (int i = 23; i <= 35; i = i + 2) {
+//        Serial.print("IN");
+//        Serial.print(i);
+//        Serial.print("=");
+//        Serial.print(digitalRead(i));
+//        Serial.print("/");
+//      }
+//      f|| (int i = 37; i <= 52; i = i + 1) {
+//        Serial.print("IN");
+//        Serial.print(i);
+//        Serial.print("=");
+//        Serial.print(digitalRead(i));
+//        Serial.print("/");
+//      }
+//      f|| (int i = 209; i <= 224; i = i + 1) {
+//        Serial.print("OUT");
+//        Serial.print(i);
+//        Serial.print("=");
+//        Serial.print(B3[i]);
+//        Serial.print("/");
+//      }
+//
+//      f|| (int i = 0; i <= 15; i = i + 1) {
+//        Serial.print("AI");
+//        Serial.print(i);
+//        Serial.print("=");
+//        Serial.print(analogRead(i));
+//        Serial.print("/");
+//      }
+//
+//      Serial.print("T.BATT1= ");
+//      Serial.print(F8[69]);
+//      Serial.print("/");
+//
+//      Serial.print("I.BATT1= ");
+//      Serial.print(F8[52]);
+//      Serial.print("/");
+//
+//      Serial.print("I.MPPT1= ");
+//      Serial.print(F8[187]);
+//      Serial.print("/");
+//
+//      Serial.print("I.MPPT2= ");
+//      Serial.print(F8[177]);
+//      Serial.print("/");
+//
+//      Serial.print("I.CHARG1= ");
+//      Serial.print(F8[207]);
+//      Serial.print("/");
+//
+//      Serial.print("I.CHARG2= ");
+//      Serial.print(F8[197]);
+//      Serial.print("/");
+//
+//      Serial.print("I.ONDUL1= ");
+//      Serial.print(F8[167]);
+//      Serial.print("/");
+//
+//      Serial.print("I.ONDUL2= ");
+//      Serial.print(F8[157]);
+//      Serial.print("/");
+//
+//
+//      Serial.print("I.BATT2= ");
+//      Serial.print(F8[247]);
+//      Serial.print("/");
+//
+//      Serial.print("I N7:60= ");
+//      Serial.print(N7M60);
+//      Serial.print("/");
+//
+//      Serial.print("I F8:161= ");
+//      Serial.print(F8M161);
+//      Serial.print("/");
+//
+//      Serial.print("I F8:132= ");
+//      Serial.print(F8M132);
+//      Serial.print("/");
+//
+//      Serial.print("I F8:125= ");
+//      Serial.print(F8M125);
+//      Serial.print("/");
+//
+//      Serial.print("I F8:105= ");
+//      Serial.print(F8M105);
+//      Serial.print("/");
+//
+//      dtostrf( TDN[IndexDebugTDProc], 1, 0, charVal);
+//      TramProc = charVal;
+//      TramProc = TramProc + "/";
+//      Serial.print(TramProc);
+//
+//      dtostrf( TDN[IndexDebugTTProc], 1, 0, charVal);
+//      TramProc = charVal;
+//      TramProc = TramProc + "/";
+//      Serial.print(TramProc);
+//
+//      Serial.print("IN22= ");
+//      Serial.print(digitalRead(22));
+//      Serial.print("/");
+//
+//      Serial.print("TDN[70]= ");
+//      Serial.print(TDN[70]);
+//      Serial.print("/");
+//
+//      dtostrf( N7[90], 1, 0, charVal);
+//      TramProc = charVal;
+//      TramProc = TramProc + "/";
+//      Serial.print(TramProc);
+//
+//      AffPointeur(Pointeur);
+//
+//      Serial.println();
+//
+//    }
