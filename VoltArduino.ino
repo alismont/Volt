@@ -9,8 +9,11 @@
 //          VCC pin   -> Arduino Digital 33 28
 //          GND pin   -> Arduino Digital 35 30
 //Time init
+//MegunoLink
 #include "MegunoLink.h"
 #include "CommandHandler.h"
+
+
 #include <Time.h>
 #include <Timer.h>
 #include <DS1302RTC.h>
@@ -307,12 +310,15 @@ bool T39TT;
 bool T55TT;
 bool T52TT;
 
-//...............................................................................gemunolink.........................................
+//MegunoLink
+char FromTable[100];
 TimePlot MyPlot;
 InterfacePanel Panel("Test");
 CommandHandler<> SerialCommandHandler;
+Table MyTable;
 
 //-----------------------------------------------------
+//MegunoLink
 void Cmd_LED13(CommandParameter &Parameters)
 {
   const char *State = Parameters.NextParameter();
@@ -335,13 +341,16 @@ void Cmd_Unknown()
 //----------------------------------------------------------------------------------SETUP
 void setup() {
 
-  Serial.begin(9600); // initialise la vitesse de la connexion série
+  Serial.begin(115200); // initialise la vitesse de la connexion série
   Serial3.begin(9600);
-  // genunolink
+
+  //MegunoLink
   Serial.print(F("gemunolink"));
   SerialCommandHandler.AddCommand(F("LED13"), Cmd_LED13);
   SerialCommandHandler.SetDefaultHandler(Cmd_Unknown);
+  MyTable.SetDescription("Cycle", "Temps de scanning");
 
+  //-------------------------------------------------------------
   Timer1.initialize(100000);         // initialize timer1
   //Timer1.setPeriod(100);
   Timer1.attachInterrupt(callback);
@@ -582,8 +591,8 @@ void setup() {
 
 //----------------------------------------------------------------------------------LOOP
 void loop() {
-
-  //SerialCommandHandler.Process();
+  //MegunoLink
+  SerialCommandHandler.Process();
 
 
   if (B3[31]) {
@@ -5695,7 +5704,8 @@ void loop() {
   Ecriture ();// tablette vers arduino
   Lecture (); // arduino vers tablette
 
-  //Gemunolink ();
+  //MegunoLink
+  Gemunolink ();
 
   //scanning
   if (CptT[70]) {
@@ -7089,8 +7099,9 @@ void Gemunolink() {
 
   Panel.SetProgress("Label1", (Cycle));
   Panel.SetProgress("Cpt", (Cycle));
-  Panel.SetText("Status", "OK");
-  //Panel.SetCheck("CheckBox1", false);
+  Panel.SetText("Status", FromTable);
+  MyTable.SendData("Cycle", Cycle);
+  //MyTable.GetData("FromTable");
 
 }
 //------------------------------------------------
