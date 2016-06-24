@@ -10,8 +10,8 @@
 //          GND pin   -> Arduino Digital 35 30
 //Time init
 //MegunoLink
-#include "MegunoLink.h"
-#include "CommandHandler.h"
+//#include "MegunoLink.h"
+//#include "CommandHandler.h"
 
 
 #include <Time.h>
@@ -63,7 +63,7 @@ int Annee;
 float TestScam = 0;
 char senderNumber[20];
 //*************** PLC ******************************
-int N7[100];
+int N7[200];
 float F8[255];
 float  AI7AUX1;
 float  AI7AUX2;
@@ -311,32 +311,32 @@ bool T55TT;
 bool T52TT;
 
 //MegunoLink
-char FromTable[100];
-TimePlot MyPlot;
-InterfacePanel Panel("Test");
-CommandHandler<> SerialCommandHandler;
-Table MyTable;
+//char FromTable[100];
+//TimePlot MyPlot;
+//InterfacePanel Panel("Test");
+//CommandHandler<> SerialCommandHandler;
+//Table MyTable;
 
 //-----------------------------------------------------
 //MegunoLink
-void Cmd_LED13(CommandParameter &Parameters)
-{
-  const char *State = Parameters.NextParameter();
-
-  if (strcmp(State, "on") == 0)
-  {
-    digitalWrite(LED13, HIGH);
-  }
-  else
-  {
-    digitalWrite(LED13, LOW);
-  }
-}
-
-void Cmd_Unknown()
-{
-  Serial.println(F("I don't know that command. Try another. "));
-}
+//void Cmd_LED13(CommandParameter &Parameters)
+//{
+//  const char *State = Parameters.NextParameter();
+//
+//  if (strcmp(State, "on") == 0)
+//  {
+//    digitalWrite(LED13, HIGH);
+//  }
+//  else
+//  {
+//    digitalWrite(LED13, LOW);
+//  }
+//}
+//
+//void Cmd_Unknown()
+//{
+//  Serial.println(F("I don't know that command. Try another. "));
+//}
 
 //----------------------------------------------------------------------------------SETUP
 void setup() {
@@ -345,10 +345,10 @@ void setup() {
   Serial3.begin(9600);
 
   //MegunoLink
-  Serial.print(F("gemunolink"));
-  SerialCommandHandler.AddCommand(F("LED13"), Cmd_LED13);
-  SerialCommandHandler.SetDefaultHandler(Cmd_Unknown);
-  MyTable.SetDescription("Cycle", "Temps de scanning");
+  //  Serial.print(F("gemunolink"));
+  //  SerialCommandHandler.AddCommand(F("LED13"), Cmd_LED13);
+  //  SerialCommandHandler.SetDefaultHandler(Cmd_Unknown);
+  //  MyTable.SetDescription("Cycle", "Temps de scanning");
 
   //-------------------------------------------------------------
   Timer1.initialize(100000);         // initialize timer1
@@ -552,6 +552,11 @@ void setup() {
   N7[67] = 98;
   N7[69] = 2;
   N7[89] = 95;
+  N7[100] = 0;
+  N7[101] = 0;
+  N7[102] = 0;
+  N7[103] = 0;
+
 
   F10[11] = 0.02;
   F10[12] = 0.04;
@@ -1777,7 +1782,7 @@ void loop() {
     F10[52] = F8[227] + F10[50];
   }
 
-  if ((F10[52] > N7[38]) && ( B3[314] || B3[315])) {
+  if ((F10[52] > N7[38]) && ( B3[314] || B3[315] || B3[304])) {
     B3[154] = 1.0;
   }
   else {
@@ -1875,7 +1880,7 @@ void loop() {
     B3[153] = 0.0;
   }
 
-  if (( B3[155] && !B3[214]) || ( B3[154] && !B3[214]) || ( ( F8[100] > N7[38]) && B3[214]) ) {
+  if ( ( B3[154] && !B3[214]) || ( ( F8[100] > N7[38]) && B3[214]) ) {
     B3[156] = 1.0;// CONDITION COURANT OK ONDULEUR
   }
   else {
@@ -2403,7 +2408,7 @@ void loop() {
 
   N7[22] = ((F8[216] / F8[215]) / (log( F8[215])) * 10 );
   T27PRE = N7[22];
-  
+
   if (B3[122]) {
     CptT[27] = true;
   }
@@ -5590,6 +5595,15 @@ void loop() {
   if (N7[103] == 10 && TDN[12] ) {
     N7[103] = 0;
   }
+  if (buttonPin31Num >= 4 ) {
+    N7[103] = 0;
+  }
+  if (buttonPin29Num >= 4 ) {
+    N7[103] = 0;
+  }
+  if (buttonPin27Num >= 4 ) {
+    N7[103] = 0;
+  }
   if (!B3[209] && buttonPin31Num >= 4 && buttonPin27Num >= 4 && !B3[304] && (!B3[11] || buttonPin39Num < 4)) {
     B3[108] = 1;
   }
@@ -5758,8 +5772,9 @@ void loop() {
 
   FirstScan = 0;
 
-  //AffProcessing();
-
+  if (B3[29]) {
+    //AffProcessing();
+  }
 
 }
 
@@ -6685,7 +6700,7 @@ void Lecture() {
     Tram = Tram + "F";
 
     Serial3.print(Tram);
-    Serial.println(Tram);
+    //Serial.println(Tram);
 
 
   }
@@ -7119,18 +7134,18 @@ void MessTraitement() {
   }
 }
 //-----------------------------------------------
-void Gemunolink() {
-
-
-  MyPlot.SendData("My Sensor", (Cycle));
-
-  Panel.SetProgress("Label1", (Cycle));
-  Panel.SetProgress("Cpt", (Cycle));
-  Panel.SetText("Status", FromTable);
-  MyTable.SendData("Cycle", Cycle);
-  //MyTable.GetData("FromTable");
-
-}
+//void Gemunolink() {
+//
+//
+//  MyPlot.SendData("My Sensor", (Cycle));
+//
+//  Panel.SetProgress("Label1", (Cycle));
+//  Panel.SetProgress("Cpt", (Cycle));
+//  Panel.SetText("Status", FromTable);
+//  MyTable.SendData("Cycle", Cycle);
+//  //MyTable.GetData("FromTable");
+//
+//}
 //------------------------------------------------
 void callback() {
 
@@ -7376,7 +7391,7 @@ void callback() {
     }*/
 }
 //-------------------------------------
-/*void AffPointeur(String P ) {
+void AffPointeur(String P ) {
   int  Default = 0;
   if (P == "ST1") {
     Serial.print("VARIABLE: ");
@@ -7539,7 +7554,7 @@ void callback() {
     Serial.print("nan");
     Serial.print("/");
   }
-  }*/
+}
 
 //------------------------------------------------
 void PasMessage() {
@@ -7576,295 +7591,296 @@ void PasMessage() {
 }
 
 //--------------------------------------------------------------------AFFICHAGE PROCESSING
-//void AffProcessing(){
-//     while (Serial.available() > 0) { // si un caractère en réception
-//
-//      octetReceptionProc = Serial.read(); // lit le 1er octet de la file d'attente
-//
-//      if (octetReceptionProc == '/') {
-//        if (chaineReceptionProc.substring(0, 2) == "F8")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(2);
-//          IndexDebugProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 2) == "N7")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(2);
-//          IndexDebugNProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 3) == "F10")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(3);
-//          IndexDebugFProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 2) == "B3")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(2);
-//          IndexDebugBProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 1) == "T")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(1);
-//          IndexDebugTProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 3) == "TDN")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(3);
-//          IndexDebugTDProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 2) == "TT")  {
-//          String InStringProc;
-//          InStringProc = chaineReceptionProc.substring(2);
-//          IndexDebugTTProc = InStringProc.toFloat();
-//        }
-//        if (chaineReceptionProc.substring(0, 3) == "VAR")  {
-//          String InStringProc;
-//          InStringProc = (chaineReceptionProc.substring(3));
-//          Pointeur = InStringProc;
-//        }
-//        if (chaineReceptionProc.substring(0, 6) == "OKPROC")  {
-//          Processing = true;
-//        }
-//        chaineReceptionProc = "";
-//        //delay(1); // pause
-//      }
-//      else {
-//        caractereReceptionProc = char(octetReceptionProc);
-//        chaineReceptionProc = chaineReceptionProc + caractereReceptionProc;
-//        //delay(1);
-//      }
-//    }
-//    if (Processing) {
-//      dtostrf( F8[IndexDebugProc], 5, 3, charVal);
-//      TramProc = charVal;
-//      TramProc = TramProc + "/";
-//
-//      dtostrf( N7[IndexDebugNProc], 5, 0, charVal);
-//      TramProc = TramProc + charVal;
-//      TramProc = TramProc + "/";
-//
-//      dtostrf( F10[IndexDebugFProc], 5, 3, charVal);
-//      TramProc = TramProc + charVal;
-//      TramProc = TramProc + "/";
-//
-//      dtostrf( B3[IndexDebugBProc], 5, 0, charVal);
-//      TramProc = TramProc + charVal;
-//      TramProc = TramProc + "/";
-//
-//      dtostrf( T[IndexDebugTProc], 5, 0, charVal);
-//      TramProc = TramProc + charVal;
-//      TramProc = TramProc + "/";
-//
-//      TramProc = TramProc + IndexDebugProc;
-//      TramProc = TramProc + "/";
-//
-//      TramProc = TramProc + IndexDebugNProc;
-//      TramProc = TramProc + "/";
-//
-//      TramProc = TramProc + IndexDebugFProc;
-//      TramProc = TramProc + "/";
-//
-//      TramProc = TramProc + IndexDebugBProc;
-//      TramProc = TramProc + "/";
-//
-//      TramProc = TramProc + IndexDebugTProc;
-//      TramProc = TramProc + "/";
-//
-//      Serial.print(TramProc);
-//
-//      Serial.print("T1= ");
-//      Serial.print(T1);
-//      Serial.print("/");
-//
-//      Serial.print("T2= ");
-//      Serial.print(T2);
-//      Serial.print("/");
-//
-//      Serial.print("T3= ");
-//      Serial.print(T3);
-//      Serial.print("/");
-//
-//      Serial.print("T4= ");
-//      Serial.print(T4);
-//      Serial.print("/");
-//
-//      Serial.print("T5= ");
-//      Serial.print(T5);
-//      Serial.print("/");
-//
-//      Serial.print("T6= ");
-//      Serial.print(T6);
-//      Serial.print("/");
-//
-//      Serial.print("T7= ");
-//      Serial.print(T7);
-//      Serial.print("/");
-//
-//      Serial.print("T8= ");
-//      Serial.print(T8);
-//      Serial.print("/");
-//
-//      Serial.print("T9= ");
-//      Serial.print(T9);
-//      Serial.print("/");
-//
-//      Serial.print("T10= ");
-//      Serial.print(T10);
-//      Serial.print("/");
-//
-//      Serial.print("ST1= ");
-//      Serial.print(ST1);
-//      Serial.print("/");
-//
-//      Serial.print("ST2= ");
-//      Serial.print(ST2);
-//      Serial.print("/");
-//
-//      Serial.print("ST3= ");
-//      Serial.print(ST3);
-//      Serial.print("/");
-//
-//      Serial.print("ST4= ");
-//      Serial.print(ST4);
-//      Serial.print("/");
-//
-//      Serial.print("ST5= ");
-//      Serial.print(ST5);
-//      Serial.print("/");
-//
-//      Serial.print("ST6= ");
-//      Serial.print(ST6);
-//      Serial.print("/");
-//
-//      Serial.print("ST7= ");
-//      Serial.print(ST7);
-//      Serial.print("/");
-//
-//      Serial.print("DN70]= ");
-//      Serial.print(TDN[70]);
-//      Serial.print("/");
-//
-//      Serial.print("DN72]= ");
-//      Serial.print(TDN[72]);
-//      Serial.print("/");
-//
-//      Serial.print("DN71]= ");
-//      Serial.print(TDN[71]);
-//      Serial.print("/");
-//
-//
-//      f|| (int i = 23; i <= 35; i = i + 2) {
-//        Serial.print("IN");
-//        Serial.print(i);
-//        Serial.print("=");
-//        Serial.print(digitalRead(i));
-//        Serial.print("/");
-//      }
-//      f|| (int i = 37; i <= 52; i = i + 1) {
-//        Serial.print("IN");
-//        Serial.print(i);
-//        Serial.print("=");
-//        Serial.print(digitalRead(i));
-//        Serial.print("/");
-//      }
-//      f|| (int i = 209; i <= 224; i = i + 1) {
-//        Serial.print("OUT");
-//        Serial.print(i);
-//        Serial.print("=");
-//        Serial.print(B3[i]);
-//        Serial.print("/");
-//      }
-//
-//      f|| (int i = 0; i <= 15; i = i + 1) {
-//        Serial.print("AI");
-//        Serial.print(i);
-//        Serial.print("=");
-//        Serial.print(analogRead(i));
-//        Serial.print("/");
-//      }
-//
-//      Serial.print("T.BATT1= ");
-//      Serial.print(F8[69]);
-//      Serial.print("/");
-//
-//      Serial.print("I.BATT1= ");
-//      Serial.print(F8[52]);
-//      Serial.print("/");
-//
-//      Serial.print("I.MPPT1= ");
-//      Serial.print(F8[187]);
-//      Serial.print("/");
-//
-//      Serial.print("I.MPPT2= ");
-//      Serial.print(F8[177]);
-//      Serial.print("/");
-//
-//      Serial.print("I.CHARG1= ");
-//      Serial.print(F8[207]);
-//      Serial.print("/");
-//
-//      Serial.print("I.CHARG2= ");
-//      Serial.print(F8[197]);
-//      Serial.print("/");
-//
-//      Serial.print("I.ONDUL1= ");
-//      Serial.print(F8[167]);
-//      Serial.print("/");
-//
-//      Serial.print("I.ONDUL2= ");
-//      Serial.print(F8[157]);
-//      Serial.print("/");
-//
-//
-//      Serial.print("I.BATT2= ");
-//      Serial.print(F8[247]);
-//      Serial.print("/");
-//
-//      Serial.print("I N7:60= ");
-//      Serial.print(N7M60);
-//      Serial.print("/");
-//
-//      Serial.print("I F8:161= ");
-//      Serial.print(F8M161);
-//      Serial.print("/");
-//
-//      Serial.print("I F8:132= ");
-//      Serial.print(F8M132);
-//      Serial.print("/");
-//
-//      Serial.print("I F8:125= ");
-//      Serial.print(F8M125);
-//      Serial.print("/");
-//
-//      Serial.print("I F8:105= ");
-//      Serial.print(F8M105);
-//      Serial.print("/");
-//
-//      dtostrf( TDN[IndexDebugTDProc], 1, 0, charVal);
-//      TramProc = charVal;
-//      TramProc = TramProc + "/";
-//      Serial.print(TramProc);
-//
-//      dtostrf( TDN[IndexDebugTTProc], 1, 0, charVal);
-//      TramProc = charVal;
-//      TramProc = TramProc + "/";
-//      Serial.print(TramProc);
-//
-//      Serial.print("IN22= ");
-//      Serial.print(digitalRead(22));
-//      Serial.print("/");
-//
-//      Serial.print("TDN[70]= ");
-//      Serial.print(TDN[70]);
-//      Serial.print("/");
-//
-//      dtostrf( N7[90], 1, 0, charVal);
-//      TramProc = charVal;
-//      TramProc = TramProc + "/";
-//      Serial.print(TramProc);
-//
-//      AffPointeur(Pointeur);
-//
-//      Serial.println();
-//
-//    }
+void AffProcessing() {
+  while (Serial.available() > 0) { // si un caractère en réception
+
+    octetReceptionProc = Serial.read(); // lit le 1er octet de la file d'attente
+
+    if (octetReceptionProc == '/') {
+      if (chaineReceptionProc.substring(0, 2) == "F8")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(2);
+        IndexDebugProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 2) == "N7")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(2);
+        IndexDebugNProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 3) == "F10")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(3);
+        IndexDebugFProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 2) == "B3")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(2);
+        IndexDebugBProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 1) == "T")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(1);
+        IndexDebugTProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 3) == "TDN")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(3);
+        IndexDebugTDProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 2) == "TT")  {
+        String InStringProc;
+        InStringProc = chaineReceptionProc.substring(2);
+        IndexDebugTTProc = InStringProc.toFloat();
+      }
+      if (chaineReceptionProc.substring(0, 3) == "VAR")  {
+        String InStringProc;
+        InStringProc = (chaineReceptionProc.substring(3));
+        Pointeur = InStringProc;
+      }
+      if (chaineReceptionProc.substring(0, 6) == "OKPROC")  {
+        Processing = true;
+      }
+      chaineReceptionProc = "";
+      //delay(1); // pause
+    }
+    else {
+      caractereReceptionProc = char(octetReceptionProc);
+      chaineReceptionProc = chaineReceptionProc + caractereReceptionProc;
+      //delay(1);
+    }
+  }
+
+  if (Processing) {
+    dtostrf( F8[IndexDebugProc], 5, 3, charVal);
+    TramProc = charVal;
+    TramProc = TramProc + "/";
+
+    dtostrf( N7[IndexDebugNProc], 5, 0, charVal);
+    TramProc = TramProc + charVal;
+    TramProc = TramProc + "/";
+
+    dtostrf( F10[IndexDebugFProc], 5, 3, charVal);
+    TramProc = TramProc + charVal;
+    TramProc = TramProc + "/";
+
+    dtostrf( B3[IndexDebugBProc], 5, 0, charVal);
+    TramProc = TramProc + charVal;
+    TramProc = TramProc + "/";
+
+    dtostrf( T[IndexDebugTProc], 5, 0, charVal);
+    TramProc = TramProc + charVal;
+    TramProc = TramProc + "/";
+
+    TramProc = TramProc + IndexDebugProc;
+    TramProc = TramProc + "/";
+
+    TramProc = TramProc + IndexDebugNProc;
+    TramProc = TramProc + "/";
+
+    TramProc = TramProc + IndexDebugFProc;
+    TramProc = TramProc + "/";
+
+    TramProc = TramProc + IndexDebugBProc;
+    TramProc = TramProc + "/";
+
+    TramProc = TramProc + IndexDebugTProc;
+    TramProc = TramProc + "/";
+
+    Serial.print(TramProc);
+
+    Serial.print("T1= ");
+    Serial.print(T1);
+    Serial.print("/");
+
+    Serial.print("T2= ");
+    Serial.print(T2);
+    Serial.print("/");
+
+    Serial.print("T3= ");
+    Serial.print(T3);
+    Serial.print("/");
+
+    Serial.print("T4= ");
+    Serial.print(T4);
+    Serial.print("/");
+
+    Serial.print("T5= ");
+    Serial.print(T5);
+    Serial.print("/");
+
+    Serial.print("T6= ");
+    Serial.print(T6);
+    Serial.print("/");
+
+    Serial.print("T7= ");
+    Serial.print(T7);
+    Serial.print("/");
+
+    Serial.print("T8= ");
+    Serial.print(T8);
+    Serial.print("/");
+
+    Serial.print("T9= ");
+    Serial.print(T9);
+    Serial.print("/");
+
+    Serial.print("T10= ");
+    Serial.print(T10);
+    Serial.print("/");
+
+    Serial.print("ST1= ");
+    Serial.print(ST1);
+    Serial.print("/");
+
+    Serial.print("ST2= ");
+    Serial.print(ST2);
+    Serial.print("/");
+
+    Serial.print("ST3= ");
+    Serial.print(ST3);
+    Serial.print("/");
+
+    Serial.print("ST4= ");
+    Serial.print(ST4);
+    Serial.print("/");
+
+    Serial.print("ST5= ");
+    Serial.print(ST5);
+    Serial.print("/");
+
+    Serial.print("ST6= ");
+    Serial.print(ST6);
+    Serial.print("/");
+
+    Serial.print("ST7= ");
+    Serial.print(ST7);
+    Serial.print("/");
+
+    Serial.print("DN70]= ");
+    Serial.print(TDN[70]);
+    Serial.print("/");
+
+    Serial.print("DN72]= ");
+    Serial.print(TDN[72]);
+    Serial.print("/");
+
+    Serial.print("DN71]= ");
+    Serial.print(TDN[71]);
+    Serial.print("/");
+
+
+    for (int i = 23; i <= 35; i = i + 2) {
+      Serial.print("IN");
+      Serial.print(i);
+      Serial.print("=");
+      Serial.print(digitalRead(i));
+      Serial.print("/");
+    }
+    for (int i = 37; i <= 52; i = i + 1) {
+      Serial.print("IN");
+      Serial.print(i);
+      Serial.print("=");
+      Serial.print(digitalRead(i));
+      Serial.print("/");
+    }
+    for (int i = 209; i <= 224; i = i + 1) {
+      Serial.print("OUT");
+      Serial.print(i);
+      Serial.print("=");
+      Serial.print(B3[i]);
+      Serial.print("/");
+    }
+    for (int i = 0; i <= 15; i = i + 1) {
+      Serial.print("AI");
+      Serial.print(i);
+      Serial.print("=");
+      Serial.print(analogRead(i));
+      Serial.print("/");
+    }
+
+    Serial.print("T.BATT1= ");
+    Serial.print(F8[69]);
+    Serial.print("/");
+
+    Serial.print("I.BATT1= ");
+    Serial.print(F8[52]);
+    Serial.print("/");
+
+    Serial.print("I.MPPT1= ");
+    Serial.print(F8[187]);
+    Serial.print("/");
+
+    Serial.print("I.MPPT2= ");
+    Serial.print(F8[177]);
+    Serial.print("/");
+
+    Serial.print("I.CHARG1= ");
+    Serial.print(F8[207]);
+    Serial.print("/");
+
+    Serial.print("I.CHARG2= ");
+    Serial.print(F8[197]);
+    Serial.print("/");
+
+    Serial.print("I.ONDUL1= ");
+    Serial.print(F8[167]);
+    Serial.print("/");
+
+    Serial.print("I.ONDUL2= ");
+    Serial.print(F8[157]);
+    Serial.print("/");
+
+
+    Serial.print("I.BATT2= ");
+    Serial.print(F8[247]);
+    Serial.print("/");
+
+    Serial.print("I N7:60= ");
+    Serial.print(N7M60);
+    Serial.print("/");
+
+    Serial.print("I F8:161= ");
+    Serial.print(F8M161);
+    Serial.print("/");
+
+    Serial.print("I F8:132= ");
+    Serial.print(F8M132);
+    Serial.print("/");
+
+    Serial.print("I F8:125= ");
+    Serial.print(F8M125);
+    Serial.print("/");
+
+    Serial.print("I F8:105= ");
+    Serial.print(F8M105);
+    Serial.print("/");
+
+    dtostrf( TDN[IndexDebugTDProc], 1, 0, charVal);
+    TramProc = charVal;
+    TramProc = TramProc + "/";
+    Serial.print(TramProc);
+
+    dtostrf( TDN[IndexDebugTTProc], 1, 0, charVal);
+    TramProc = charVal;
+    TramProc = TramProc + "/";
+    Serial.print(TramProc);
+
+    Serial.print("IN22= ");
+    Serial.print(digitalRead(22));
+    Serial.print("/");
+
+    Serial.print("TDN[70]= ");
+    Serial.print(TDN[70]);
+    Serial.print("/");
+
+    dtostrf( N7[90], 1, 0, charVal);
+    TramProc = charVal;
+    TramProc = TramProc + "/";
+    Serial.print(TramProc);
+
+    AffPointeur(Pointeur);
+
+    Serial.println();
+
+  }
+}
