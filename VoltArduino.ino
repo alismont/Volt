@@ -21,10 +21,10 @@
 //#include <LiquidCrystal_I2C.h>
 #include "TimerOne.h"
 
-// set time f||mat 2015/10/02 10:02:00
+// set time format 2015/10/02 10:02:00
 // Set pins:  CE, IO,CLK
 DS1302RTC RTC(36, 34, 32);
-// Optional connection f|| RTC module
+// Optional connection for RTC module
 #define DS1302_GND_PIN 30
 #define DS1302_VCC_PIN 28
 //********************************************************************************gsm
@@ -576,13 +576,13 @@ void setup() {
   //    delay(50);
   //  }
   //  while (SYNCHRO == 0);
-
-
-  // set time
-  // setTime(20, 24, 0, 20, 1, 2016); //set the system time to
+//********************************************************************************
+//Horloge
+   //set time
+  // setTime(16, 37, 0, 24, 6, 2016); //set the system time to
   //  23h31m30s on 3Feb2009
   // RTC.set(now());                     //set the RTC from the system time
-
+//********************************************************************************
   if (sms.available()) {
     sms.flush();
     Message = "";
