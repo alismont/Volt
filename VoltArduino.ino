@@ -579,9 +579,9 @@ void setup() {
 //********************************************************************************
 //Horloge
    //set time
-  // setTime(16, 37, 0, 24, 6, 2016); //set the system time to
+   setTime(16, 49, 0, 24, 6, 2016); //set the system time to
   //  23h31m30s on 3Feb2009
-  // RTC.set(now());                     //set the RTC from the system time
+   RTC.set(now());                     //set the RTC from the system time
 //********************************************************************************
   if (sms.available()) {
     sms.flush();
@@ -5773,7 +5773,7 @@ void loop() {
   FirstScan = 0;
 
   if (B3[29]) {
-    //AffProcessing();
+    AffProcessing();
   }
 
 }
